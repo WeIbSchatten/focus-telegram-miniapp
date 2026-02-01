@@ -42,9 +42,17 @@ git push -u origin main
 - **HTTPS:** при запросе пароля используйте [Personal Access Token](https://github.com/settings/tokens) (scope `repo`) вместо пароля.
 - **SSH:** ключ должен быть добавлен в GitHub (Settings → SSH and GPG keys).
 
-## 4. CI (проверка сборки)
+## 4. CI (GitHub Actions)
 
-В проекте есть `.github/workflows/build.yml` — при push в ветки `main` или `master` GitHub Actions запускает сборку фронтенда. Секреты и переменные для деплоя задавайте в Settings → Secrets and variables → Actions.
+В проекте настроен пайплайн `.github/workflows/ci.yml` — при push и pull request в ветки `main` или `master` запускаются:
+
+- **Frontend** — установка зависимостей, lint, сборка Next.js
+- **Focus Service** — установка зависимостей, сборка NestJS
+- **Focus Kids Service** — установка Python-зависимостей
+- **Telegram Bot** — установка зависимостей, сборка TypeScript
+- **Docker build** — проверка сборки всех Docker-образов (после успешной сборки остальных)
+
+Секреты и переменные для деплоя задавайте в Settings → Secrets and variables → Actions.
 
 ## 5. Что не попадает в репозиторий (уже в .gitignore)
 
