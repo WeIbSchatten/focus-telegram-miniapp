@@ -20,16 +20,16 @@ git init
 git remote add origin https://gitlab.com/weibschatten1/FucusVN#
 
 # Или по SSH
-git remote add origin git@gitlab.com:ВАШ_USERNAME/focus-telegram-miniapp.git
+git remote add origin https://gitlab.com/weibschatten1/FucusVN.git
 ```
 
 Если remote `origin` уже есть (например, с GitHub), переименуйте или замените:
 
 ```bash
 git remote -v
-git remote set-url origin https://gitlab.com/ВАШ_USERNAME/focus-telegram-miniapp.git
+git remote set-url origin https://gitlab.com/weibschatten1/FucusVN.git
 # или добавить второй remote:
-git remote add gitlab https://gitlab.com/ВАШ_USERNAME/focus-telegram-miniapp.git
+git remote add gitlab https://gitlab.com/weibschatten1/FucusVN.git
 ```
 
 ## 3. Первый пуш в GitLab
