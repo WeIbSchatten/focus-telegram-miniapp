@@ -1,0 +1,51 @@
+version: "3.9"
+
+services:
+  focus-db:
+    image: postgres:16
+    container_name: focus-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-focus}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-focus_password}
+      POSTGRES_DB: ${POSTGRES_DB:-focus_db}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - focus-db-data:/var/lib/postgresql/data
+      - ./database/init-scripts:/docker-entrypoint-initdb.d
+
+  focus-service:
+    build: ./backend/focus-service
+    container_name: focus-service
+    depends_on:
+      - focus-db
+    env_file:
+      - ./backend/focus-service/.env
+    ports:
+      - "3001:3000"
+
+  focus-kids-service:
+    build: ./backend/focus-kids-service
+    container_name: focus-kids-service
+    depends_on:
+      - focus-db
+    env_file:
+      - ./backend/focus-kids-service/.env
+    ports:
+      - "8001:8000"
+
+  frontend:
+    build: ./frontend
+    container_name: focus-frontend
+    env_file:
+      - ./frontend/.env.local
+    ports:
+      - "3000:3000"
+    depends_on:
+      - focus-service
+      - focus-kids-service
+
+volumes:
+  focus-db-data:
+
