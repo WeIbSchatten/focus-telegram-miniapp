@@ -102,6 +102,13 @@ CORS_ORIGINS_EXTRA=https://focusvn.mooo.com
 - `длинный_случайный_секрет_...` — случайные строки (например, `openssl rand -hex 32`).
 - Для домена **focusvn.mooo.com** оставьте `CORS_ORIGINS_EXTRA=https://focusvn.mooo.com`.
 
+**Быстрое создание всех файлов:** в репозитории есть скрипт `docs/create-env-files.sh`, в котором уже подставлены три ключа (пароль БД, INTERNAL_API_SECRET, TELEGRAM_BOT_NOTIFY_SECRET). На сервере после клонирования выполните:
+```bash
+cd /opt/focus-telegram-miniapp
+bash docs/create-env-files.sh
+```
+После этого вручную укажите в `backend/focus-service/.env` и `backend/telegram-bot/.env` свой `TELEGRAM_BOT_TOKEN`, а в `frontend/.env.local` — `NEXT_PUBLIC_TELEGRAM_BOT_NAME` (имя бота без @).
+
 **5.2. backend/focus-service/.env**
 
 ```env
