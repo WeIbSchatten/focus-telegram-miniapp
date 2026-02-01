@@ -17,7 +17,7 @@
 git init
 
 # Добавить GitHub как remote (замените на свой URL)
-git remote add origin https://github.com/ВАШ_USERNAME/focus-telegram-miniapp.git
+git remote add origin https://github.com/WeIbSchatten/focus-telegram-miniapp.git
 
 # Или по SSH
 git remote add origin git@github.com:ВАШ_USERNAME/focus-telegram-miniapp.git
@@ -26,7 +26,7 @@ git remote add origin git@github.com:ВАШ_USERNAME/focus-telegram-miniapp.git
 Если remote `origin` уже есть, замените URL:
 
 ```bash
-git remote set-url origin https://github.com/ВАШ_USERNAME/focus-telegram-miniapp.git
+git remote set-url origin https://github.com/WeIbSchatten/focus-telegram-miniapp.git
 ```
 
 ## 3. Первый пуш в GitHub
