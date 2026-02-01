@@ -24,18 +24,17 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: "npm"
-          cache-dependency-path: frontend/package-lock.json
+          cache-dependency-path: package-lock.json
 
       - name: Install dependencies
         run: |
-          cd frontend
           if [ -f package-lock.json ]; then npm ci; else npm install; fi
 
-      - name: Lint
-        run: cd frontend && npm run lint
+      - name: Lint (frontend)
+        run: npm --workspace frontend run lint
 
-      - name: Build
-        run: cd frontend && npm run build
+      - name: Build (frontend)
+        run: npm --workspace frontend run build
 
   # --- Focus Service (NestJS) ---
   focus-service:
