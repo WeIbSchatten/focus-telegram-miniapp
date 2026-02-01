@@ -16,6 +16,7 @@ def _get_bearer_token(request: Request) -> str | None:
 
 
 @router.get("/", response_model=list[TeacherRead])
+@router.get("", response_model=list[TeacherRead])  # без слэша: /api/teachers
 def list_teachers(
   db: Session = Depends(get_db),
   _user=Depends(get_current_kids_role),
@@ -24,6 +25,7 @@ def list_teachers(
 
 
 @router.post("/", response_model=TeacherRead, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=TeacherRead, status_code=status.HTTP_201_CREATED)  # без слэша
 def create_teacher(
   payload: TeacherCreate,
   request: Request,
@@ -34,7 +36,7 @@ def create_teacher(
   if result == "not_found":
     raise HTTPException(
       status_code=status.HTTP_400_BAD_REQUEST,
-      detail="focus_user_id not found in Focus service",
+      detail="Пользователь не найден в сервисе Focus",
     )
   teacher = Teacher(full_name=payload.full_name, focus_user_id=payload.focus_user_id)
   db.add(teacher)
@@ -51,7 +53,7 @@ def get_teacher(
 ):
   teacher = db.query(Teacher).get(teacher_id)
   if not teacher:
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Teacher not found")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Преподаватель не найден")
   return teacher
 
 
@@ -64,7 +66,7 @@ def update_teacher(
 ):
   teacher = db.query(Teacher).get(teacher_id)
   if not teacher:
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Teacher not found")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Преподаватель не найден")
 
   if payload.full_name is not None:
     teacher.full_name = payload.full_name
@@ -82,7 +84,7 @@ def delete_teacher(
 ):
   teacher = db.query(Teacher).get(teacher_id)
   if not teacher:
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Teacher not found")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Преподаватель не найден")
   db.delete(teacher)
   db.commit()
   return None

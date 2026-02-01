@@ -12,6 +12,7 @@ class Test(Base):
   title: Mapped[str] = mapped_column(String(200))
   description: Mapped[str | None] = mapped_column(Text, nullable=True)
   order: Mapped[int] = mapped_column(default=0)
+  max_attempts: Mapped[int | None] = mapped_column(Integer, nullable=True)  # None = неограниченно
 
   program: Mapped["Program"] = relationship(back_populates="tests")
   questions: Mapped[list["TestQuestion"]] = relationship(back_populates="test", cascade="all, delete-orphan")

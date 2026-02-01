@@ -20,7 +20,7 @@ def get_current_kids_role(
   """
   focus_user_id = current_user.get("sub") or current_user.get("userId")
   if not focus_user_id:
-    raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+    raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Неверный токен")
 
   teacher = db.query(Teacher).filter(Teacher.focus_user_id == focus_user_id).first()
   if teacher:
@@ -40,9 +40,19 @@ def get_current_kids_role(
       "student_id": student.id,
     }
 
+  # Администратор и модератор имеют права учителя для управления учениками, группами, преподавателями
+  jwt_role = current_user.get("role")
+  if jwt_role in ("admin", "moderator"):
+    return {
+      "role": "teacher",
+      "focus_user_id": focus_user_id,
+      "teacher_id": None,
+      "student_id": None,
+    }
+
   raise HTTPException(
     status_code=status.HTTP_403_FORBIDDEN,
-    detail="You are not registered as teacher or student in Focus Kids",
+    detail="Вы не зарегистрированы как преподаватель или ученик в Focus Kids",
   )
 
 
@@ -50,7 +60,7 @@ def require_teacher(current: dict = Depends(get_current_kids_role)):
   if current["role"] != "teacher":
     raise HTTPException(
       status_code=status.HTTP_403_FORBIDDEN,
-      detail="Teacher access required",
+      detail="Требуется роль преподавателя",
     )
   return current
 
@@ -59,7 +69,7 @@ def require_student(current: dict = Depends(get_current_kids_role)):
   if current["role"] != "student":
     raise HTTPException(
       status_code=status.HTTP_403_FORBIDDEN,
-      detail="Student access required",
+      detail="Требуется роль ученика",
     )
   return current
 

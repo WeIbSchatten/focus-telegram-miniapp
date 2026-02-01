@@ -10,6 +10,9 @@ from app.models.test import (
   TestSubmission,
   TestSubmissionAnswer,
 )
+from app.models.program import Program
+from app.models.student import Student
+from app.services.telegram_notify import notify_students
 from app.schemas.test import (
   TestCreate,
   TestRead,
@@ -24,6 +27,7 @@ router = APIRouter(prefix="/tests", tags=["tests"])
 
 
 @router.get("/", response_model=list[TestRead])
+@router.get("", response_model=list[TestRead])
 def list_tests(
   db: Session = Depends(get_db),
   _user=Depends(get_current_kids_role),
@@ -57,6 +61,7 @@ def list_tests_by_program(
 
 
 @router.post("/", response_model=TestRead, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=TestRead, status_code=status.HTTP_201_CREATED)  # без слэша
 def create_test(
   payload: TestCreate,
   db: Session = Depends(get_db),
@@ -67,6 +72,7 @@ def create_test(
     title=payload.title,
     description=payload.description,
     order=payload.order,
+    max_attempts=payload.max_attempts,
   )
   db.add(test)
   db.flush()
@@ -92,6 +98,15 @@ def create_test(
 
   db.commit()
   db.refresh(test)
+  program = db.query(Program).get(payload.program_id)
+  if program:
+    students = db.query(Student).filter(Student.group_id == program.group_id).all()
+    focus_ids = [s.focus_user_id for s in students]
+    notify_students(
+      focus_ids,
+      "new_test",
+      {"program_name": program.name, "test_title": payload.title},
+    )
   return test
 
 
@@ -109,7 +124,7 @@ def get_test(
     .get(test_id)
   )
   if not test:
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Test not found")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Тест не найден")
   return test
 
 
@@ -122,7 +137,7 @@ def update_test(
 ):
   test = db.query(Test).get(test_id)
   if not test:
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Test not found")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Тест не найден")
 
   if payload.title is not None:
     test.title = payload.title
@@ -130,6 +145,8 @@ def update_test(
     test.description = payload.description
   if payload.order is not None:
     test.order = payload.order
+  if payload.max_attempts is not None:
+    test.max_attempts = payload.max_attempts
 
   db.commit()
   db.refresh(test)
@@ -144,7 +161,7 @@ def delete_test(
 ):
   test = db.query(Test).get(test_id)
   if not test:
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Test not found")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Тест не найден")
   db.delete(test)
   db.commit()
   return None
@@ -166,7 +183,26 @@ def create_submission(
     .get(payload.test_id)
   )
   if not test:
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Test not found")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Тест не найден")
+
+  # Ограничение попыток: если у теста задано max_attempts, проверяем количество уже сданных.
+  # Разрешённые учителем пересдачи (is_approved_for_retake) дают ученику дополнительную попытку.
+  if test.max_attempts is not None:
+    used_attempts = db.query(TestSubmission).filter(
+      TestSubmission.test_id == payload.test_id,
+      TestSubmission.student_id == payload.student_id,
+    ).count()
+    approved_retakes = db.query(TestSubmission).filter(
+      TestSubmission.test_id == payload.test_id,
+      TestSubmission.student_id == payload.student_id,
+      TestSubmission.is_approved_for_retake == True,
+    ).count()
+    allowed_attempts = test.max_attempts + approved_retakes
+    if used_attempts >= allowed_attempts:
+      raise HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail=f"Превышено число попыток ({test.max_attempts} + {approved_retakes} пересдач). Дополнительную попытку может разрешить учитель.",
+      )
 
   # Создаём submission
   submission = TestSubmission(
@@ -249,6 +285,31 @@ def list_submissions_by_student(
   return submissions
 
 
+@router.get("/submissions/best-by-student/{student_id}", response_model=list[TestSubmissionRead])
+def list_best_submissions_by_student(
+  student_id: int,
+  db: Session = Depends(get_db),
+  current=Depends(get_current_kids_role),
+):
+  """Одна лучшая попытка по каждому тесту. Для статистики и отображения ученику."""
+  if current["role"] == "student" and current["student_id"] != student_id:
+    raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Доступ только к своим результатам")
+  submissions = (
+    db.query(TestSubmission)
+    .filter(TestSubmission.student_id == student_id)
+    .options(joinedload(TestSubmission.answers))
+    .all()
+  )
+  best_by_test: dict[int, TestSubmission] = {}
+  for s in submissions:
+    prev = best_by_test.get(s.test_id)
+    s_score = s.score if s.score is not None else -1
+    prev_score = prev.score if prev and prev.score is not None else -1
+    if prev is None or s_score > prev_score:
+      best_by_test[s.test_id] = s
+  return list(best_by_test.values())
+
+
 @router.patch("/submissions/{submission_id}", response_model=TestSubmissionRead)
 def update_submission(
   submission_id: int,
@@ -258,7 +319,7 @@ def update_submission(
 ):
   submission = db.query(TestSubmission).get(submission_id)
   if not submission:
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Submission not found")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Попытка прохождения не найдена")
 
   if payload.is_approved_for_retake is not None:
     submission.is_approved_for_retake = payload.is_approved_for_retake

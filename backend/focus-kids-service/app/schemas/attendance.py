@@ -8,6 +8,7 @@ class AttendanceBase(BaseModel):
   group_id: int
   lesson_date: date
   present: bool = True
+  program_id: int | None = None  # тема/программа урока
 
 
 class AttendanceCreate(AttendanceBase):
@@ -16,10 +17,12 @@ class AttendanceCreate(AttendanceBase):
 
 class AttendanceUpdate(BaseModel):
   present: bool | None = None
+  program_id: int | None = None
 
 
 class AttendanceRead(AttendanceBase):
   id: int
+  program_id: int | None = None
 
   class Config:
     from_attributes = True

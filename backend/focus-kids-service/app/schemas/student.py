@@ -11,6 +11,11 @@ class StudentCreate(StudentBase):
   pass
 
 
+class StudentUpdate(BaseModel):
+  full_name: str | None = None
+  group_id: int | None = None
+
+
 class StudentRead(StudentBase):
   id: int
 

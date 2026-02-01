@@ -37,6 +37,6 @@ def get_embed_html(
     return ""
   return (
     f'<iframe width="{width}" height="{height}" src="{src}" '
-    'frameBorder="0" allow="clipboard-write; autoplay" '
+    'frameBorder="0" allow="clipboard-write; autoplay; fullscreen" '
     'webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>'
   )

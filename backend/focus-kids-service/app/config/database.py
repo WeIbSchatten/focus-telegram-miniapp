@@ -5,7 +5,7 @@ from .settings import settings
 from app.models.base import Base
 
 
-engine = create_engine(settings.APP_DATABASE_URL, future=True, echo=False)
+engine = create_engine(settings.database_url_for_sqlalchemy, future=True, echo=False)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 

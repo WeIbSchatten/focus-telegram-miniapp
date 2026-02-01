@@ -23,19 +23,19 @@ export class AuthService {
   async validateTelegramInitData(initData: string): Promise<{ accessToken: string }> {
     const botToken = this.appCfg.telegramBotToken;
     if (!botToken) {
-      throw new UnauthorizedException('Telegram auth is not configured');
+      throw new UnauthorizedException('Вход через Telegram не настроен');
     }
     if (!validateTelegramWebAppData(initData, botToken)) {
-      throw new UnauthorizedException('Invalid Telegram initData');
+      throw new UnauthorizedException('Неверные данные Telegram');
     }
     const tgUser = parseTelegramUserFromInitData(initData);
     if (!tgUser) {
-      throw new UnauthorizedException('Invalid Telegram user data');
+      throw new UnauthorizedException('Неверные данные пользователя Telegram');
     }
     const telegramUserId = String(tgUser.id);
     const user = await this.usersService.findByTelegramUserId(telegramUserId);
     if (!user) {
-      throw new UnauthorizedException('Telegram user not linked. Register first and link Telegram in profile.');
+      throw new UnauthorizedException('Telegram не привязан. Зарегистрируйтесь и привяжите Telegram в профиле.');
     }
     const payload = { sub: user.id, role: user.role };
     const accessToken = await this.jwtService.signAsync(payload, {
@@ -48,12 +48,12 @@ export class AuthService {
   async validateUser(loginDto: LoginDto): Promise<{ accessToken: string }> {
     const user = await this.usersService.findByEmail(loginDto.email);
     if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException('Неверный email или пароль');
     }
 
     const isMatch = await bcrypt.compare(loginDto.password, user.passwordHash);
     if (!isMatch) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException('Неверный email или пароль');
     }
 
     const payload = { sub: user.id, role: user.role };

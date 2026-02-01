@@ -10,6 +10,7 @@ router = APIRouter(prefix="/attendance", tags=["attendance"])
 
 
 @router.post("/", response_model=AttendanceRead, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=AttendanceRead, status_code=status.HTTP_201_CREATED)  # без слэша
 def create_attendance(
   payload: AttendanceCreate,
   db: Session = Depends(get_db),
@@ -20,6 +21,7 @@ def create_attendance(
     group_id=payload.group_id,
     lesson_date=payload.lesson_date,
     present=payload.present,
+    program_id=payload.program_id,
   )
   db.add(record)
   db.commit()
@@ -54,10 +56,12 @@ def update_attendance(
 ):
   record = db.query(Attendance).get(attendance_id)
   if not record:
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Attendance not found")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Запись посещаемости не найдена")
 
   if payload.present is not None:
     record.present = payload.present
+  if payload.program_id is not None:
+    record.program_id = payload.program_id
 
   db.commit()
   db.refresh(record)
@@ -72,7 +76,7 @@ def delete_attendance(
 ):
   record = db.query(Attendance).get(attendance_id)
   if not record:
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Attendance not found")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Запись посещаемости не найдена")
   db.delete(record)
   db.commit()
   return None

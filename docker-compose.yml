@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   focus-db:
     image: postgres:16
@@ -22,6 +20,8 @@ services:
       - focus-db
     env_file:
       - ./backend/focus-service/.env
+    environment:
+      - INTERNAL_API_SECRET=${INTERNAL_API_SECRET:-change_me_internal_secret}
     ports:
       - "3001:3000"
 
@@ -30,21 +30,53 @@ services:
     container_name: focus-kids-service
     depends_on:
       - focus-db
+      - focus-service
+      - telegram-bot
     env_file:
       - ./backend/focus-kids-service/.env
+    environment:
+      - FOCUS_SERVICE_URL=http://focus-service:3000
+      - TELEGRAM_BOT_NOTIFY_URL=http://focus-telegram-bot:4000
+      - TELEGRAM_BOT_NOTIFY_SECRET=${TELEGRAM_BOT_NOTIFY_SECRET:-change_me_notify_secret}
+      - CORS_ORIGINS_EXTRA=${CORS_ORIGINS_EXTRA:-https://09e52bf30fd6d5.lhr.life}
     ports:
       - "8001:8000"
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      args:
+        NEXT_PUBLIC_FOCUS_API_URL: ""
+        NEXT_PUBLIC_KIDS_API_URL: ""
+        REWRITE_FOCUS_URL: http://focus-service:3000
+        REWRITE_KIDS_URL: http://focus-kids-service:8000
     container_name: focus-frontend
     env_file:
       - ./frontend/.env.local
+    environment:
+      # Прокси: Next.js читает rewrites() при старте — без этого в контейнере fallback localhost и данные не грузятся
+      - REWRITE_FOCUS_URL=http://focus-service:3000
+      - REWRITE_KIDS_URL=http://focus-kids-service:8000
     ports:
       - "3000:3000"
     depends_on:
       - focus-service
       - focus-kids-service
+
+  telegram-bot:
+    build: ./backend/telegram-bot
+    container_name: focus-telegram-bot
+    env_file:
+      - ./backend/telegram-bot/.env
+    environment:
+      - FOCUS_SERVICE_URL=http://focus-service:3000
+      - INTERNAL_API_SECRET=${INTERNAL_API_SECRET:-change_me_internal_secret}
+      - NOTIFY_SECRET=${TELEGRAM_BOT_NOTIFY_SECRET:-change_me_notify_secret}
+    depends_on:
+      - focus-service
+    ports:
+      - "4000:4000"
+    restart: unless-stopped
 
 volumes:
   focus-db-data:

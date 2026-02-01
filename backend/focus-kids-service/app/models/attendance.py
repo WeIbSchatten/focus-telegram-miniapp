@@ -14,6 +14,7 @@ class Attendance(Base):
   group_id: Mapped[int] = mapped_column(ForeignKey("groups.id"))
   lesson_date: Mapped[date] = mapped_column(Date)
   present: Mapped[bool] = mapped_column(Boolean, default=True)
+  program_id: Mapped[int | None] = mapped_column(ForeignKey("programs.id"), nullable=True)  # тема/программа урока
 
   student: Mapped["Student"] = relationship()
   group: Mapped["Group"] = relationship()

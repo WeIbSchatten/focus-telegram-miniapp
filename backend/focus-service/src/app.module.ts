@@ -8,6 +8,8 @@ import { User } from './modules/users/entities/user.entity';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { ModerationModule } from './modules/moderation/moderation.module';
+import { InternalModule } from './modules/internal/internal.module';
+import { ContentModule } from './modules/content/content.module';
 
 @Module({
   imports: [
@@ -29,6 +31,8 @@ import { ModerationModule } from './modules/moderation/moderation.module';
     AuthModule,
     UsersModule,
     ModerationModule,
+    InternalModule,
+    ContentModule,
   ],
 })
 export class AppModule {}

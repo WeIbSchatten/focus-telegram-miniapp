@@ -15,12 +15,12 @@ def decode_jwt_token(token: str) -> dict:
   except jwt.ExpiredSignatureError:
     raise HTTPException(
       status_code=status.HTTP_401_UNAUTHORIZED,
-      detail="Token expired"
+      detail="Срок действия токена истёк"
     )
   except jwt.InvalidTokenError:
     raise HTTPException(
       status_code=status.HTTP_401_UNAUTHORIZED,
-      detail="Invalid token"
+      detail="Неверный токен"
     )
 
 

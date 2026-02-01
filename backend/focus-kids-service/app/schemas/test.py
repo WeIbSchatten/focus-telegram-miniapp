@@ -42,6 +42,7 @@ class TestBase(BaseModel):
   title: str
   description: str | None = None
   order: int = 0
+  max_attempts: int | None = None  # None = неограниченно попыток
 
 
 class TestCreate(TestBase):
@@ -53,12 +54,14 @@ class TestUpdate(BaseModel):
   title: str | None = None
   description: str | None = None
   order: int | None = None
+  max_attempts: int | None = None
 
 
 class TestRead(TestBase):
   id: int
   program_id: int
   questions: list[TestQuestionRead] = []
+  max_attempts: int | None = None
 
   class Config:
     from_attributes = True

@@ -3,6 +3,9 @@ from sqlalchemy.orm import Session, joinedload
 
 from app.config.database import get_db
 from app.models.homework import Homework, HomeworkFile, HomeworkSubmission, HomeworkSubmissionFile, HomeworkComment
+from app.models.program import Program
+from app.models.student import Student
+from app.services.telegram_notify import notify_students
 from app.schemas.homework import (
   HomeworkCreate,
   HomeworkRead,
@@ -19,6 +22,7 @@ router = APIRouter(prefix="/homeworks", tags=["homeworks"])
 
 
 @router.get("/", response_model=list[HomeworkRead])
+@router.get("", response_model=list[HomeworkRead])
 def list_homeworks(
   db: Session = Depends(get_db),
   _user=Depends(get_current_kids_role),
@@ -68,6 +72,19 @@ def create_homework(
 
   db.commit()
   db.refresh(homework)
+  program = db.query(Program).get(payload.program_id)
+  if program:
+    students = db.query(Student).filter(Student.group_id == program.group_id).all()
+    focus_ids = [s.focus_user_id for s in students]
+    notify_students(
+      focus_ids,
+      "new_homework",
+      {
+        "program_name": program.name,
+        "homework_title": payload.title,
+        "homework_description": payload.description or None,
+      },
+    )
   return homework
 
 
@@ -83,7 +100,7 @@ def get_homework(
     .get(homework_id)
   )
   if not homework:
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Homework not found")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Домашнее задание не найдено")
   return homework
 
 
@@ -96,7 +113,7 @@ def update_homework(
 ):
   homework = db.query(Homework).get(homework_id)
   if not homework:
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Homework not found")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Домашнее задание не найдено")
 
   if payload.title is not None:
     homework.title = payload.title
@@ -118,7 +135,7 @@ def delete_homework(
 ):
   homework = db.query(Homework).get(homework_id)
   if not homework:
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Homework not found")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Домашнее задание не найдено")
   db.delete(homework)
   db.commit()
   return None
@@ -197,7 +214,7 @@ def update_submission(
 ):
   submission = db.query(HomeworkSubmission).get(submission_id)
   if not submission:
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Submission not found")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Ответ не найден")
 
   if payload.answer_text is not None:
     submission.answer_text = payload.answer_text

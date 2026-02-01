@@ -18,7 +18,7 @@ async def verify_kids_access(
   if not user_id:
     raise HTTPException(
       status_code=status.HTTP_401_UNAUTHORIZED,
-      detail="Invalid token payload"
+      detail="Неверные данные токена"
     )
 
   # Получаем токен из заголовка
@@ -37,7 +37,7 @@ async def verify_kids_access(
         if not user_data.get("hasKidsAccess", False):
           raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Access to Focus Kids is not granted. Please contact moderator."
+            detail="Доступ к Focus Kids не выдан. Обратитесь к модератору или администратору."
           )
         return current_user
       elif response.status_code == 404:
@@ -48,7 +48,7 @@ async def verify_kids_access(
       else:
         raise HTTPException(
           status_code=status.HTTP_403_FORBIDDEN,
-          detail="Could not verify access to Focus Kids"
+          detail="Не удалось проверить доступ к Focus Kids"
         )
   except httpx.RequestError as e:
     # Если Focus сервис недоступен, логируем и разрешаем доступ (для dev)

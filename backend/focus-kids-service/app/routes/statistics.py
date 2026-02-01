@@ -25,11 +25,12 @@ def get_student_statistics(
   db: Session = Depends(get_db),
   current=Depends(get_current_kids_role),
 ):
+  # Ученик — только свои данные; администратор и модератор (роль teacher с student_id=None) — полный доступ
   if current["role"] == "student" and current["student_id"] != student_id:
-    raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Can only view own statistics")
+    raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Доступ только к своей статистике")
   student = db.query(Student).get(student_id)
   if not student:
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Student not found")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Ученик не найден")
 
   # Посещаемость
   attendance_records = db.query(Attendance).filter(Attendance.student_id == student_id).all()
@@ -37,37 +38,61 @@ def get_student_statistics(
   attended_lessons = sum(1 for a in attendance_records if a.present)
   attendance_rate = (attended_lessons / total_lessons * 100) if total_lessons > 0 else 0.0
 
-  # Оценки
+  # Оценки за занятия: только типы, которые являются оценками 1–5 (без homework_next, teacher_comment и тестов)
   grades = db.query(Grade).filter(Grade.student_id == student_id).all()
-  total_grades = len(grades)
-  average_grade = sum(g.value for g in grades) / total_grades if total_grades > 0 else None
+  lesson_grade_types = ("oral_hw", "written_hw", "dictation", "classwork")
+  grades_for_avg = [g for g in grades if g.type in lesson_grade_types]
+  total_grades = len(grades_for_avg)
+  average_grade = sum(g.value for g in grades_for_avg) / total_grades if total_grades > 0 else None
 
-  # Домашние задания
+  # Домашние задания: из программ (Homework + HomeworkSubmission) и с уроков (оценки homework_next)
   from app.models.program import Program
+
+  program_total_hw = 0
+  program_completed_hw = 0
   if student.group_id:
     group_programs = db.query(Program).filter(Program.group_id == student.group_id).all()
     program_ids = [p.id for p in group_programs]
     if program_ids:
       group_homeworks = db.query(Homework).filter(Homework.program_id.in_(program_ids)).all()
-      total_homeworks = len(group_homeworks)
+      program_total_hw = len(group_homeworks)
       homework_ids = [h.id for h in group_homeworks]
       if homework_ids:
-        completed_homeworks = db.query(HomeworkSubmission).filter(
+        program_completed_hw = db.query(HomeworkSubmission).filter(
           and_(
             HomeworkSubmission.student_id == student_id,
             HomeworkSubmission.homework_id.in_(homework_ids)
           )
         ).count()
       else:
-        completed_homeworks = 0
+        program_completed_hw = 0
     else:
-      total_homeworks = 0
-      completed_homeworks = 0
+      program_total_hw = 0
+      program_completed_hw = 0
   else:
-    total_homeworks = 0
-    completed_homeworks = 0
+    program_total_hw = 0
+    program_completed_hw = 0
 
-  # Тесты
+  # ДЗ с уроков: оценки типа homework_next; «выполнено» — если на более позднем уроке есть oral_hw или written_hw
+  lesson_hw_grades = [
+    g for g in grades
+    if g.type == "homework_next" and g.lesson_date is not None
+  ]
+  lesson_hw_total = len(lesson_hw_grades)
+  lesson_hw_completed = 0
+  for g in lesson_hw_grades:
+    assigned_date = g.lesson_date
+    has_later_grade = any(
+      og.type in ("oral_hw", "written_hw") and og.lesson_date is not None and og.lesson_date > assigned_date
+      for og in grades
+    )
+    if has_later_grade:
+      lesson_hw_completed += 1
+
+  total_homeworks = program_total_hw + lesson_hw_total
+  completed_homeworks = program_completed_hw + lesson_hw_completed
+
+  # Тесты: считаем количество решённых тестов (уникальных), средний балл — по лучшей попытке по каждому тесту
   if student.group_id:
     group_programs = db.query(Program).filter(Program.group_id == student.group_id).all()
     program_ids = [p.id for p in group_programs]
@@ -76,23 +101,26 @@ def get_student_statistics(
       total_tests = len(group_tests)
       test_ids = [t.id for t in group_tests]
       if test_ids:
-        completed_tests = db.query(TestSubmission).filter(
-          and_(
-            TestSubmission.student_id == student_id,
-            TestSubmission.test_id.in_(test_ids)
-          )
-        ).count()
         test_submissions = db.query(TestSubmission).filter(
           and_(
             TestSubmission.student_id == student_id,
             TestSubmission.test_id.in_(test_ids),
-            TestSubmission.score.isnot(None)
+            TestSubmission.score.isnot(None),
           )
         ).all()
-        if test_submissions:
-          total_score = sum(s.score for s in test_submissions)
-          max_score = sum(s.max_score for s in test_submissions) if all(s.max_score for s in test_submissions) else len(test_submissions) * 100
-          average_test_score = (total_score / max_score * 100) if max_score > 0 else None
+        # Уникальные тесты (сколько тестов решено), лучшая попытка по каждому тесту
+        best_by_test: dict[int, TestSubmission] = {}
+        for s in test_submissions:
+          prev = best_by_test.get(s.test_id)
+          s_score = s.score or -1
+          prev_score = prev.score if prev else -1
+          if prev is None or s_score > prev_score:
+            best_by_test[s.test_id] = s
+        completed_tests = len(best_by_test)
+        if best_by_test:
+          total_score = sum(s.score for s in best_by_test.values())
+          total_max = sum(s.max_score or 0 for s in best_by_test.values())
+          average_test_score = (total_score / total_max * 100) if total_max > 0 else None
         else:
           average_test_score = None
       else:
@@ -128,44 +156,39 @@ def get_teacher_statistics(
   db: Session = Depends(get_db),
   current=Depends(get_current_kids_role),
 ):
-  if current["role"] != "teacher" or current["teacher_id"] != teacher_id:
-    raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Can only view own teacher statistics")
-  # Получаем все группы учителя
+  # Учитель — только свои данные; администратор и модератор — полный доступ (teacher_id is None)
+  if current["role"] != "teacher":
+    raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Требуется роль преподавателя")
+  if current["teacher_id"] is not None and current["teacher_id"] != teacher_id:
+    raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Доступ только к своей статистике преподавателя")
+
   groups = db.query(Group).filter(Group.teacher_id == teacher_id).all()
   total_groups = len(groups)
-
   group_stats = []
   total_students = 0
 
-  for group in groups:
-    students = db.query(Student).filter(Student.group_id == group.id).all()
+  for gr in groups:
+    students = db.query(Student).filter(Student.group_id == gr.id).all()
     group_students_count = len(students)
     total_students += group_students_count
 
-    # Средняя посещаемость по группе
-    attendance_records = db.query(Attendance).filter(Attendance.group_id == group.id).all()
-    if attendance_records:
-      total_lessons = len(attendance_records)
-      attended_lessons = sum(1 for a in attendance_records if a.present)
-      avg_attendance = (attended_lessons / total_lessons * 100) if total_lessons > 0 else 0.0
-    else:
-      avg_attendance = 0.0
-      total_lessons = 0
+    attendance_records = db.query(Attendance).filter(Attendance.group_id == gr.id).all()
+    total_lessons = len(attendance_records)
+    attended_lessons = sum(1 for a in attendance_records if a.present)
+    avg_attendance = (attended_lessons / total_lessons * 100) if total_lessons > 0 else 0.0
 
-    # Средняя оценка по группе
-    grades = db.query(Grade).filter(Grade.group_id == group.id).all()
-    if grades:
-      avg_grade = sum(g.value for g in grades) / len(grades)
-    else:
-      avg_grade = None
+    grades = db.query(Grade).filter(Grade.group_id == gr.id).all()
+    lesson_grade_types = ("oral_hw", "written_hw", "dictation", "classwork")
+    grades_for_avg = [g for g in grades if g.type in lesson_grade_types]
+    avg_grade = (sum(g.value for g in grades_for_avg) / len(grades_for_avg)) if grades_for_avg else None
 
     group_stats.append(
       TeacherGroupStatisticsRead(
-        group_id=group.id,
-        group_name=group.name,
+        group_id=gr.id,
+        group_name=gr.name or "",
         total_students=group_students_count,
         average_attendance_rate=round(avg_attendance, 2),
-        average_grade=round(avg_grade, 2) if avg_grade else None,
+        average_grade=round(avg_grade, 2) if avg_grade is not None else None,
         total_lessons=total_lessons,
       )
     )
@@ -186,7 +209,7 @@ def get_group_overview(
 ):
   group = db.query(Group).get(group_id)
   if not group:
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Group not found")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Группа не найдена")
 
   students = db.query(Student).filter(Student.group_id == group_id).all()
   
@@ -201,7 +224,9 @@ def get_group_overview(
     attendance_rate = (attended / len(student_attendance) * 100) if student_attendance else 0.0
     
     student_grades = db.query(Grade).filter(Grade.student_id == student.id).all()
-    avg_grade = sum(g.value for g in student_grades) / len(student_grades) if student_grades else None
+    lesson_grade_types = ("oral_hw", "written_hw", "dictation", "classwork")
+    grades_for_avg = [g for g in student_grades if g.type in lesson_grade_types]
+    avg_grade = sum(g.value for g in grades_for_avg) / len(grades_for_avg) if grades_for_avg else None
     
     student_stats.append({
       "student_id": student.id,
