@@ -24,7 +24,7 @@ const config: Config = {
           DEFAULT: '#99B898',
           light: '#b5cfb4',
           dark: '#7a9d79',
-          text: '#1e3d1e',
+          text: '#1a3d19',
         },
         background: '#f0f0f5',
       },
@@ -44,7 +44,7 @@ const config: Config = {
       backgroundImage: {
         'gradient-primary': 'linear-gradient(135deg, #201E45 0%, #404267 100%)',
         'gradient-banner': 'linear-gradient(135deg, #201E45 0%, #404267 80%)',
-        'gradient-sense': 'linear-gradient(135deg, #d4d4e4 0%, #E4E4EF 80%)',
+        'gradient-sense': 'linear-gradient(135deg, #7a9d79 0%, #99B898 80%)',
         'gradient-kids': 'linear-gradient(135deg, #e85c5c 0%, #F07B7B 80%)',
       },
     },
