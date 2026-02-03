@@ -14,6 +14,7 @@ export function Header() {
 
   const logoHref = (() => {
     if (!isAuthenticated) return ROUTES.home;
+    if (pathname === '/' || pathname === ROUTES.home) return ROUTES.home;
     if (pathname.startsWith('/sense') && hasSenseAccess) return ROUTES.sense.root;
     if (pathname.startsWith('/kids') && hasKidsAccess) return ROUTES.kids.root;
     return hasKidsAccess ? ROUTES.kids.root : hasSenseAccess ? ROUTES.sense.root : ROUTES.home;
