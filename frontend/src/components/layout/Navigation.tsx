@@ -13,6 +13,14 @@ export function getNavItems(hasKidsAccess: boolean, hasSenseAccess: boolean) {
   return items;
 }
 
+/** Из ФИО (Фамилия Имя Отчество) возвращает только имя для отображения в шапке. */
+function getDisplayName(fullName: string | null | undefined): string {
+  if (!fullName?.trim()) return '';
+  const parts = fullName.trim().split(/\s+/).filter(Boolean);
+  if (parts.length >= 2) return parts[1];
+  return parts[0] ?? '';
+}
+
 export function Navigation() {
   const router = useRouter();
   const pathname = usePathname();
@@ -57,12 +65,12 @@ export function Navigation() {
   );
 
   return (
-    <nav className="flex flex-wrap items-center gap-4 md:gap-6">
+    <nav className="flex w-full min-w-0 flex-1 items-center gap-2 sm:gap-3 md:gap-4 md:w-auto md:flex-initial">
       {navItems.map(({ href, label }) => (
         <Link
           key={href}
           href={href}
-          className={`font-medium text-white transition hover:opacity-90 hover:underline ${
+          className={`whitespace-nowrap text-sm font-medium text-white transition hover:opacity-90 hover:underline sm:text-base ${
             pathname === href ? 'font-semibold underline' : ''
           }`}
         >
@@ -70,15 +78,16 @@ export function Navigation() {
         </Link>
       ))}
       {isAuthenticated ? (
-        <div className="relative w-full min-w-0 md:w-auto md:min-w-0 md:ml-2" ref={menuRef}>
+        <div className="relative ml-auto w-[6rem] shrink-0" ref={menuRef}>
           <button
             type="button"
             onClick={() => setMenuOpen((o) => !o)}
-            className="flex items-center gap-1 rounded-lg border border-white px-3 py-1.5 text-sm font-medium text-white opacity-95 transition hover:bg-white/20 hover:opacity-100 w-full md:w-auto justify-center md:justify-start"
+            className="flex w-full min-w-0 items-center justify-center gap-1 rounded-lg border border-white px-2 py-1.5 text-sm font-medium text-white opacity-95 transition hover:bg-white/20 hover:opacity-100"
             aria-expanded={menuOpen}
             aria-haspopup="true"
+            title={user?.fullName ?? undefined}
           >
-            <span className="truncate">{user?.fullName}</span>
+            <span className="truncate">{getDisplayName(user?.fullName) || user?.fullName || ''}</span>
             <svg
               className={`h-4 w-4 shrink-0 transition ${menuOpen ? 'rotate-180' : ''}`}
               fill="none"
