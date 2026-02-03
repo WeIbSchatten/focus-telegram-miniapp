@@ -11,7 +11,7 @@ import { Button } from '@/components/common/Button';
 import { Card } from '@/components/common/Card';
 import { ROUTES } from '@/lib/constants';
 import { useNavigateAfterSuccess } from '@/lib/utils/navigation';
-import { isValidEmail, isValidPassword } from '@/lib/utils/validation';
+import { isValidEmail, isValidPassword, isValidFullName, FULL_NAME_HINT } from '@/lib/utils/validation';
 
 export default function AdminRegisterPage() {
   const { user } = useAuth();
@@ -38,6 +38,11 @@ export default function AdminRegisterPage() {
     }
     if (!isValidPassword(password)) {
       setError('Пароль не менее 6 символов');
+      return;
+    }
+    if (!isValidFullName(fullName)) {
+      setError(FULL_NAME_HINT);
+      toast(FULL_NAME_HINT);
       return;
     }
     setLoading(true);
@@ -72,7 +77,7 @@ export default function AdminRegisterPage() {
       <h1 className="text-heading text-primary">Регистрация пользователя</h1>
       <Card>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <Input label="ФИО" type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} required placeholder="Иван Иванов" />
+          <Input label="ФИО" type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} required placeholder="Фамилия Имя Отчество" />
           <Input label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
           <Input label="Пароль (не менее 6 символов)" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
           {error && <p className="text-sm text-red-600">{error}</p>}

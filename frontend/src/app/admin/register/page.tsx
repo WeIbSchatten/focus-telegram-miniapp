@@ -11,7 +11,7 @@ import { Button } from '@/components/common/Button';
 import { Card } from '@/components/common/Card';
 import { ROUTES } from '@/lib/constants';
 import { useNavigateAfterSuccess } from '@/lib/utils/navigation';
-import { isValidEmail, isValidPassword } from '@/lib/utils/validation';
+import { isValidEmail, isValidPassword, isValidFullName, FULL_NAME_HINT } from '@/lib/utils/validation';
 
 export default function AdminRegisterPage() {
   const { user } = useAuth();
@@ -38,6 +38,10 @@ export default function AdminRegisterPage() {
     }
     if (!isValidPassword(password)) {
       setError('Пароль не менее 6 символов');
+      return;
+    }
+    if (!isValidFullName(fullName)) {
+      setError(FULL_NAME_HINT);
       return;
     }
     setLoading(true);
@@ -80,7 +84,7 @@ export default function AdminRegisterPage() {
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
             required
-            placeholder="Иван Иванов"
+            placeholder="Фамилия Имя Отчество"
           />
           <Input
             label="Email"

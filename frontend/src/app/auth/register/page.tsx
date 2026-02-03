@@ -9,7 +9,7 @@ import { Input } from '@/components/common/Input';
 import { Button } from '@/components/common/Button';
 import { Card } from '@/components/common/Card';
 import { ROUTES } from '@/lib/constants';
-import { isValidEmail, isValidPassword } from '@/lib/utils/validation';
+import { isValidEmail, isValidPassword, isValidFullName, FULL_NAME_HINT } from '@/lib/utils/validation';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -36,6 +36,11 @@ export default function RegisterPage() {
     }
     if (!isValidPassword(password)) {
       setError('Пароль не менее 6 символов');
+      return;
+    }
+    if (!isValidFullName(fullName)) {
+      setError(FULL_NAME_HINT);
+      toast(FULL_NAME_HINT);
       return;
     }
     setLoading(true);
@@ -105,7 +110,7 @@ export default function RegisterPage() {
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
             required
-            placeholder="Иван Иванов"
+            placeholder="Фамилия Имя Отчество"
           />
           <Input
             label="Email"

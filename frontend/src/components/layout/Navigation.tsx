@@ -37,6 +37,25 @@ export function Navigation() {
     router.push(ROUTES.home);
   };
 
+  const dropdownContent = (
+    <>
+      <Link
+        href={ROUTES.profile}
+        onClick={() => setMenuOpen(false)}
+        className="block px-4 py-2 text-sm text-gray-800 hover:bg-gray-100"
+      >
+        Личный кабинет
+      </Link>
+      <button
+        type="button"
+        onClick={handleLogout}
+        className="block w-full px-4 py-2 text-left text-sm text-gray-800 hover:bg-gray-100"
+      >
+        Выйти
+      </button>
+    </>
+  );
+
   return (
     <nav className="flex flex-wrap items-center gap-4 md:gap-6">
       {navItems.map(({ href, label }) => (
@@ -51,15 +70,15 @@ export function Navigation() {
         </Link>
       ))}
       {isAuthenticated ? (
-        <div className="relative md:ml-2" ref={menuRef}>
+        <div className="relative w-full min-w-0 md:w-auto md:min-w-0 md:ml-2" ref={menuRef}>
           <button
             type="button"
             onClick={() => setMenuOpen((o) => !o)}
-            className="flex items-center gap-1 rounded-lg border border-white px-3 py-1.5 text-sm font-medium text-white opacity-95 transition hover:bg-white/20 hover:opacity-100"
+            className="flex items-center gap-1 rounded-lg border border-white px-3 py-1.5 text-sm font-medium text-white opacity-95 transition hover:bg-white/20 hover:opacity-100 w-full md:w-auto justify-center md:justify-start"
             aria-expanded={menuOpen}
             aria-haspopup="true"
           >
-            {user?.fullName}
+            <span className="truncate">{user?.fullName}</span>
             <svg
               className={`h-4 w-4 shrink-0 transition ${menuOpen ? 'rotate-180' : ''}`}
               fill="none"
@@ -70,22 +89,16 @@ export function Navigation() {
             </svg>
           </button>
           {menuOpen && (
-            <div className="absolute right-0 top-full z-50 mt-1 min-w-[10rem] rounded-lg border border-white/30 bg-white py-1 shadow-lg">
-              <Link
-                href={ROUTES.profile}
-                onClick={() => setMenuOpen(false)}
-                className="block px-4 py-2 text-sm text-gray-800 hover:bg-gray-100"
-              >
-                Личный кабинет
-              </Link>
-              <button
-                type="button"
-                onClick={handleLogout}
-                className="block w-full px-4 py-2 text-left text-sm text-gray-800 hover:bg-gray-100"
-              >
-                Выйти
-              </button>
-            </div>
+            <>
+              {/* На узких экранах — в потоке документа, без наложения */}
+              <div className="mt-1 w-full rounded-lg border border-white/30 bg-white py-1 shadow-lg md:hidden">
+                {dropdownContent}
+              </div>
+              {/* На md+ — абсолютное позиционирование, не выходит за экран */}
+              <div className="absolute left-0 top-full z-50 mt-1 min-w-[10rem] max-w-[min(20rem,calc(100vw-2rem))] rounded-lg border border-white/30 bg-white py-1 shadow-lg hidden md:block md:right-0 md:left-auto md:min-w-[12rem]">
+                {dropdownContent}
+              </div>
+            </>
           )}
         </div>
       ) : (

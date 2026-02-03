@@ -13,6 +13,7 @@ import { Modal } from '@/components/common/Modal';
 import { Input } from '@/components/common/Input';
 import { useToast } from '@/hooks/useToast';
 import { ROUTES } from '@/lib/constants';
+import { isValidFullName, FULL_NAME_HINT } from '@/lib/utils/validation';
 import type { Student } from '@/types/kids';
 
 export default function AdminStudentsPage() {
@@ -55,6 +56,10 @@ export default function AdminStudentsPage() {
     e.preventDefault();
     if (!formFullName.trim() || !formFocusUserId.trim()) {
       toast('Заполните ФИО и выберите пользователя');
+      return;
+    }
+    if (!isValidFullName(formFullName)) {
+      toast(FULL_NAME_HINT);
       return;
     }
     setSubmitting(true);

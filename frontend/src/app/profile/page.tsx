@@ -14,6 +14,7 @@ import { Button } from '@/components/common/Button';
 import { Input } from '@/components/common/Input';
 import { Loader } from '@/components/common/Loader';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { isValidFullName, FULL_NAME_HINT } from '@/lib/utils/validation';
 import type { TeacherStatistics } from '@/types/kids';
 
 export default function ProfilePage() {
@@ -71,10 +72,15 @@ export default function ProfilePage() {
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
+    const nameToSave = profileEdit.fullName.trim();
+    if (nameToSave && !isValidFullName(nameToSave)) {
+      showToast(FULL_NAME_HINT);
+      return;
+    }
     setProfileSaving(true);
     try {
       const updated = await focusClient.auth.updateProfile({
-        fullName: profileEdit.fullName.trim() || undefined,
+        fullName: nameToSave || undefined,
         email: profileEdit.email.trim() || undefined,
       });
       setUser(updated);
@@ -239,10 +245,10 @@ export default function ProfilePage() {
         <h2 className="mb-4 text-xl font-bold text-primary">Редактировать профиль</h2>
         <form onSubmit={handleSaveProfile} className="max-w-md space-y-4">
           <Input
-            label="Имя"
+            label="ФИО"
             value={profileEdit.fullName}
             onChange={(e) => setProfileEdit((p) => ({ ...p, fullName: e.target.value }))}
-            placeholder="ФИО"
+            placeholder="Фамилия Имя Отчество"
           />
           <Input
             type="email"

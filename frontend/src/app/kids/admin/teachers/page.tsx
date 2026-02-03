@@ -13,6 +13,7 @@ import { Modal } from '@/components/common/Modal';
 import { Input } from '@/components/common/Input';
 import { useToast } from '@/hooks/useToast';
 import { ROUTES } from '@/lib/constants';
+import { isValidFullName, FULL_NAME_HINT } from '@/lib/utils/validation';
 
 type TeacherRow = { id: number; full_name: string; focus_user_id: string };
 
@@ -49,6 +50,10 @@ export default function AdminTeachersPage() {
     e.preventDefault();
     if (!formFullName.trim() || !formFocusUserId.trim()) {
       toast('Заполните ФИО и выберите пользователя');
+      return;
+    }
+    if (!isValidFullName(formFullName)) {
+      toast(FULL_NAME_HINT);
       return;
     }
     setSubmitting(true);
