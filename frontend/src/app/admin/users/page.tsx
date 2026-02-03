@@ -91,7 +91,11 @@ export default function PlatformAdminUsersPage() {
     const rolesToSave = newRoles.length ? newRoles : ['user'];
     setUpdating(userId);
     try {
-      await focusClient.users.setRoles(userId, rolesToSave);
+      const { roles: savedRoles } = await focusClient.users.setRoles(userId, rolesToSave);
+      setUsers((prev) =>
+        prev.map((u) => (u.id === userId ? { ...u, roles: savedRoles } : u))
+      );
+
       if (role === 'teacher' && checked) {
         try {
           const teachers = await kidsClient.teachers.list();
@@ -102,7 +106,16 @@ export default function PlatformAdminUsersPage() {
             });
           }
         } catch {
-          // уже есть или нет доступа к Kids
+          toast('Роль учителя в Focus сохранена, но не удалось добавить в преподаватели Focus Kids. Проверьте доступ к Kids.');
+        }
+      }
+      if (role === 'teacher' && !checked) {
+        try {
+          const teachers = await kidsClient.teachers.list();
+          const teacher = teachers.find((t) => t.focus_user_id === userId);
+          if (teacher) await kidsClient.teachers.delete(teacher.id);
+        } catch {
+          toast('Роль учителя в Focus убрана, но не удалось удалить из преподавателей Focus Kids.');
         }
       }
       if (role === 'student' && checked) {
@@ -116,9 +129,19 @@ export default function PlatformAdminUsersPage() {
             });
           }
         } catch {
-          // уже есть или нет доступа к Kids
+          toast('Роль ученика в Focus сохранена, но не удалось добавить в ученики Focus Kids. Проверьте доступ к Kids.');
         }
       }
+      if (role === 'student' && !checked) {
+        try {
+          const students = await kidsClient.students.list();
+          const student = students.find((s) => s.focus_user_id === userId);
+          if (student) await kidsClient.students.delete(student.id);
+        } catch {
+          toast('Роль ученика в Focus убрана, но не удалось удалить из учеников Focus Kids (возможно, есть связанные данные).');
+        }
+      }
+
       await loadUsers();
       toast('Роли обновлены');
     } catch {

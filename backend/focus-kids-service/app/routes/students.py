@@ -82,3 +82,17 @@ def update_student(
   db.refresh(student)
   return student
 
+
+@router.delete("/{student_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_student(
+  student_id: int,
+  db: Session = Depends(get_db),
+  _user=Depends(require_teacher),
+):
+  student = db.query(Student).get(student_id)
+  if not student:
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Ученик не найден")
+  db.delete(student)
+  db.commit()
+  return None
+

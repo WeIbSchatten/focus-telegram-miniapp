@@ -124,6 +124,7 @@ export const kidsClient = {
       kidsApi.post<Student>('/students/', data).then((r) => r.data),
     update: (id: number, data: { full_name?: string; group_id?: number | null }) =>
       kidsApi.patch<Student>(`/students/${id}`, data).then((r) => r.data),
+    delete: (id: number) => kidsApi.delete(`/students/${id}`).then(() => undefined),
   },
   teachers: {
     list: () => kidsApi.get<{ id: number; full_name: string; focus_user_id: string }[]>('/teachers/').then((r) => r.data),
