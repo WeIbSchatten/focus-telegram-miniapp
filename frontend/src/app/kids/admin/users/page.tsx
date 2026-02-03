@@ -8,6 +8,7 @@ import { focusClient } from '@/lib/api/focus-client';
 import { Card } from '@/components/common/Card';
 import { Button } from '@/components/common/Button';
 import { Loader } from '@/components/common/Loader';
+import { PageHeader, PAGE_ACTION_BUTTON_CLASS } from '@/components/layout/PageHeader';
 import { useToast } from '@/hooks/useToast';
 import { ROUTES } from '@/lib/constants';
 import type { FocusUser } from '@/types/user';
@@ -96,12 +97,16 @@ export default function AdminUsersPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="text-heading text-primary">Пользователи</h1>
-        <Link href={ROUTES.kids.admin.register}>
-          <Button variant="primary">Зарегистрировать пользователя</Button>
-        </Link>
-      </div>
+      <PageHeader
+        title="Пользователи"
+        actions={
+          <Link href={ROUTES.kids.admin.register}>
+            <Button variant="outline" className={PAGE_ACTION_BUTTON_CLASS}>
+              Зарегистрировать пользователя
+            </Button>
+          </Link>
+        }
+      />
 
       <Card>
         <div className="overflow-x-auto">

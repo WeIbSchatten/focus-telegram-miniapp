@@ -7,6 +7,7 @@ import { kidsClient } from '@/lib/api/kids-client';
 import { Card } from '@/components/common/Card';
 import { Button } from '@/components/common/Button';
 import { Loader } from '@/components/common/Loader';
+import { PageHeader } from '@/components/layout/PageHeader';
 import { ROUTES } from '@/lib/constants';
 import type { ProgramWithCounts } from '@/types/kids';
 
@@ -44,8 +45,10 @@ export default function AddVideoPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-heading text-primary">Добавить видео</h1>
-      <p className="text-gray-700">Выберите программу, к которой хотите добавить или изменить видео.</p>
+      <PageHeader
+        title="Добавить видео"
+        description="Выберите программу, к которой хотите добавить или изменить видео."
+      />
       {programs.length === 0 ? (
         <Card>
           <p className="text-gray-700">Нет доступных программ.</p>
@@ -61,7 +64,7 @@ export default function AddVideoPage() {
                     <p className="mt-1 text-sm text-gray-600 line-clamp-2">{prog.description}</p>
                   )}
                   <div className="mt-3">
-                    <Button variant="outline" className="text-sm w-full sm:w-auto">
+                    <Button variant="outline" className="min-h-[2.5rem] min-w-[10rem] w-full text-sm sm:w-auto">
                       Добавить или изменить видео
                     </Button>
                   </div>

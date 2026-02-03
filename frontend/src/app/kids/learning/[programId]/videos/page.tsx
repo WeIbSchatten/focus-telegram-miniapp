@@ -8,6 +8,7 @@ import { kidsClient } from '@/lib/api/kids-client';
 import { Card } from '@/components/common/Card';
 import { Button } from '@/components/common/Button';
 import { Input } from '@/components/common/Input';
+import { PageHeader, PAGE_ACTION_BUTTON_CLASS } from '@/components/layout/PageHeader';
 import { Loader } from '@/components/common/Loader';
 import { Modal } from '@/components/common/Modal';
 import { useToast } from '@/hooks/useToast';
@@ -144,20 +145,17 @@ export default function ProgramVideosPage() {
 
   return (
     <div className="space-y-8">
-      <section>
-        <h1 className="text-heading text-primary">Видео по программе: {program.name}</h1>
-        <p className="mt-2 text-gray-700">
-          Добавляйте ссылки на видео с YouTube, VK Video или RuTube. Ученики увидят их в разделе «Обучение» при открытии программы.
-        </p>
-      </section>
-
-      {canEdit && (
-        <div>
-          <Button variant="kids" onClick={openCreate}>
-            + Добавить видео
-          </Button>
-        </div>
-      )}
+      <PageHeader
+        title={`Видео по программе: ${program.name}`}
+        description="Добавляйте ссылки на видео с YouTube, VK Video или RuTube. Ученики увидят их в разделе «Обучение» при открытии программы."
+        actions={
+          canEdit ? (
+            <Button variant="outline" className={PAGE_ACTION_BUTTON_CLASS} onClick={openCreate}>
+              Добавить видео
+            </Button>
+          ) : undefined
+        }
+      />
 
       {lectures.length === 0 ? (
         <Card>

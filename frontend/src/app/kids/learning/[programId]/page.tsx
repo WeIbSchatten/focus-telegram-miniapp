@@ -8,6 +8,7 @@ import { kidsClient } from '@/lib/api/kids-client';
 import { Card } from '@/components/common/Card';
 import { Button } from '@/components/common/Button';
 import { Loader } from '@/components/common/Loader';
+import { PAGE_ACTION_BUTTON_CLASS } from '@/components/layout/PageHeader';
 import { ROUTES } from '@/lib/constants';
 import { useKidsStore } from '@/store/kidsStore';
 import type { Program } from '@/types/kids';
@@ -55,11 +56,11 @@ export default function ProgramPage() {
       </section>
 
       <section>
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
+        <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-xl font-bold text-primary">Видео по темам — всего: {lectures.length}</h2>
           {canEditVideos && (
             <Link href={ROUTES.kids.learningProgramVideos(programId)}>
-              <Button variant="outline">Добавить видео</Button>
+              <Button variant="outline" className={PAGE_ACTION_BUTTON_CLASS}>Добавить видео</Button>
             </Link>
           )}
         </div>

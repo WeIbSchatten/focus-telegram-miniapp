@@ -8,6 +8,7 @@ import { kidsClient } from '@/lib/api/kids-client';
 import { Card } from '@/components/common/Card';
 import { Button } from '@/components/common/Button';
 import { Loader } from '@/components/common/Loader';
+import { PageHeader, PAGE_ACTION_BUTTON_CLASS } from '@/components/layout/PageHeader';
 import { Modal } from '@/components/common/Modal';
 import { Input } from '@/components/common/Input';
 import { useToast } from '@/hooks/useToast';
@@ -111,10 +112,14 @@ export default function AdminGroupsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="text-heading text-primary">Группы</h1>
-        <Button variant="kids" onClick={() => setModalOpen(true)}>Создать группу</Button>
-      </div>
+      <PageHeader
+        title="Группы"
+        actions={
+          <Button variant="outline" className={PAGE_ACTION_BUTTON_CLASS} onClick={() => setModalOpen(true)}>
+            Создать группу
+          </Button>
+        }
+      />
 
       {loadError && (
         <div className="rounded-lg border-2 border-amber-300 bg-amber-50 px-4 py-3 text-amber-900">
@@ -132,11 +137,13 @@ export default function AdminGroupsPage() {
             <p className="text-sm text-gray-700">Учеников: {g.students?.length ?? 0}</p>
             <div className="mt-3 flex flex-wrap gap-2">
               <Link href={ROUTES.kids.admin.groupEdit(g.id)}>
-                <Button variant="outline" className="text-sm">Редактировать</Button>
+                <Button variant="outline" className="min-h-[2.5rem] min-w-[8rem] text-sm">
+                  Редактировать
+                </Button>
               </Link>
               <Button
-                variant="ghost"
-                className="text-sm"
+                variant="outline"
+                className="min-h-[2.5rem] min-w-[8rem] text-sm"
                 onClick={() => setAssignModal({ groupId: g.id, groupName: g.name })}
               >
                 Привязать ученика

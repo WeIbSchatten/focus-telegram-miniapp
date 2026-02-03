@@ -8,6 +8,7 @@ import { focusClient } from '@/lib/api/focus-client';
 import { Card } from '@/components/common/Card';
 import { Button } from '@/components/common/Button';
 import { Loader } from '@/components/common/Loader';
+import { PageHeader, PAGE_ACTION_BUTTON_CLASS } from '@/components/layout/PageHeader';
 import { Modal } from '@/components/common/Modal';
 import { Input } from '@/components/common/Input';
 import { useToast } from '@/hooks/useToast';
@@ -83,10 +84,14 @@ export default function AdminStudentsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="text-heading text-primary">Ученики</h1>
-        <Button variant="kids" onClick={() => setModalOpen(true)}>Добавить ученика</Button>
-      </div>
+      <PageHeader
+        title="Ученики"
+        actions={
+          <Button variant="outline" className={PAGE_ACTION_BUTTON_CLASS} onClick={() => setModalOpen(true)}>
+            Добавить ученика
+          </Button>
+        }
+      />
 
       <Card>
         <div className="overflow-x-auto">

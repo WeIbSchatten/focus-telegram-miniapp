@@ -12,6 +12,7 @@ import { Card } from '@/components/common/Card';
 import { Button } from '@/components/common/Button';
 import { Input } from '@/components/common/Input';
 import { Loader } from '@/components/common/Loader';
+import { PageHeader } from '@/components/layout/PageHeader';
 import type { TeacherStatistics } from '@/types/kids';
 
 export default function KidsProfilePage() {
@@ -104,13 +105,17 @@ export default function KidsProfilePage() {
 
   return (
     <div className="space-y-8">
-      <section>
-        <h1 className="text-heading text-primary">Личный кабинет</h1>
-        <p className="mt-2 text-gray-700">{user?.fullName}</p>
-        <p className="text-sm text-gray-600">
-          Роль: {user?.role === 'admin' ? 'Администратор' : user?.role === 'moderator' ? 'Модератор' : role === 'student' ? 'Ученик' : role === 'teacher' ? 'Учитель' : '—'}
-        </p>
-      </section>
+      <PageHeader
+        title="Личный кабинет"
+        description={
+          <>
+            <p className="text-gray-700">{user?.fullName}</p>
+            <p className="text-sm text-gray-600">
+              Роль: {user?.role === 'admin' ? 'Администратор' : user?.role === 'moderator' ? 'Модератор' : role === 'student' ? 'Ученик' : role === 'teacher' ? 'Учитель' : '—'}
+            </p>
+          </>
+        }
+      />
 
       <Card variant="kids">
         <h2 className="mb-4 text-xl font-bold text-primary">Telegram</h2>

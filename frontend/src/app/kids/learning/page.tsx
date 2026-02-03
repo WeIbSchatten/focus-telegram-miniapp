@@ -8,6 +8,7 @@ import { kidsClient } from '@/lib/api/kids-client';
 import { Card } from '@/components/common/Card';
 import { Button } from '@/components/common/Button';
 import { Loader } from '@/components/common/Loader';
+import { PageHeader, PAGE_ACTION_BUTTON_CLASS } from '@/components/layout/PageHeader';
 import { ROUTES } from '@/lib/constants';
 import type { Program, ProgramWithCounts, Group } from '@/types/kids';
 
@@ -99,26 +100,30 @@ export default function LearningPage() {
 
   return (
     <div className="space-y-8">
-      <section>
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <h1 className="text-heading text-primary">Обучение</h1>
-          </div>
-          {canEdit && (
-            <div className="flex flex-wrap items-center gap-2">
-              <Link href={ROUTES.kids.createProgram}>
-                <Button variant="outline">Создать программу</Button>
+      <PageHeader
+        title="Обучение"
+        actions={
+          canEdit ? (
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-3 sm:max-w-2xl">
+              <Link href={ROUTES.kids.createProgram} className="block">
+                <Button variant="outline" className={`w-full ${PAGE_ACTION_BUTTON_CLASS}`}>
+                  Создать программу
+                </Button>
               </Link>
-              <Link href={ROUTES.kids.addVideo}>
-                <Button variant="outline">Добавить видео</Button>
+              <Link href={ROUTES.kids.addVideo} className="block">
+                <Button variant="outline" className={`w-full ${PAGE_ACTION_BUTTON_CLASS}`}>
+                  Добавить видео
+                </Button>
               </Link>
-              <Link href={ROUTES.kids.createTest}>
-                <Button variant="kids">Создать тест</Button>
+              <Link href={ROUTES.kids.createTest} className="block">
+                <Button variant="outline" className={`w-full ${PAGE_ACTION_BUTTON_CLASS}`}>
+                  Создать тест
+                </Button>
               </Link>
             </div>
-          )}
-        </div>
-      </section>
+          ) : undefined
+        }
+      />
 
       {programs.length === 0 ? (
         <Card>
@@ -174,7 +179,9 @@ export default function LearningPage() {
               {canEdit && (
                 <div className="mt-4 pt-4 border-t border-primary/10">
                   <Link href={ROUTES.kids.editProgram(prog.id)}>
-                    <Button variant="outline" className="text-sm w-full sm:w-auto">Изменить программу</Button>
+                    <Button variant="outline" className="min-h-[2.5rem] min-w-[10rem] w-full text-sm sm:w-auto">
+                      Изменить программу
+                    </Button>
                   </Link>
                 </div>
               )}

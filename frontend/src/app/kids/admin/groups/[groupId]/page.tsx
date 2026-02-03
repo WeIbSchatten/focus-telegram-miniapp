@@ -7,6 +7,7 @@ import { kidsClient } from '@/lib/api/kids-client';
 import { Card } from '@/components/common/Card';
 import { Button } from '@/components/common/Button';
 import { Input } from '@/components/common/Input';
+import { PageHeader, PAGE_ACTION_BUTTON_CLASS } from '@/components/layout/PageHeader';
 import { Loader } from '@/components/common/Loader';
 import { Modal } from '@/components/common/Modal';
 import { useToast } from '@/hooks/useToast';
@@ -128,12 +129,14 @@ export default function AdminGroupEditPage() {
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="text-heading text-primary">Редактирование группы</h1>
-        <Link href={ROUTES.kids.admin.groups}>
-          <Button variant="ghost">← К списку групп</Button>
-        </Link>
-      </div>
+      <PageHeader
+        title="Редактирование группы"
+        actions={
+          <Link href={ROUTES.kids.admin.groups}>
+            <Button variant="outline" className={PAGE_ACTION_BUTTON_CLASS}>← К списку групп</Button>
+          </Link>
+        }
+      />
 
       <Card>
         <h2 className="mb-4 text-xl font-bold text-primary">Данные группы</h2>
@@ -168,10 +171,10 @@ export default function AdminGroupEditPage() {
       </Card>
 
       <Card>
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
+        <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-xl font-bold text-primary">Ученики в группе ({studentsInGroup.length})</h2>
-          <Button variant="kids" onClick={() => setAssignModalOpen(true)}>
-            + Добавить ученика
+          <Button variant="outline" className={PAGE_ACTION_BUTTON_CLASS} onClick={() => setAssignModalOpen(true)}>
+            Добавить ученика
           </Button>
         </div>
         {studentsInGroup.length === 0 ? (

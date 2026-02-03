@@ -6,6 +6,7 @@ import { kidsClient } from '@/lib/api/kids-client';
 import { StatisticsChart } from '@/components/kids/StatisticsChart';
 import { Card } from '@/components/common/Card';
 import { Loader } from '@/components/common/Loader';
+import { PageHeader } from '@/components/layout/PageHeader';
 import type { StudentStatistics, TeacherStatistics } from '@/types/kids';
 
 export default function StatisticsPage() {
@@ -40,7 +41,7 @@ export default function StatisticsPage() {
 
   return (
     <div className="space-y-8">
-      <h1 className="text-heading text-primary">Статистика</h1>
+      <PageHeader title="Статистика" />
 
       {role === 'student' && studentStats && (
         <StatisticsChart stats={studentStats} />
