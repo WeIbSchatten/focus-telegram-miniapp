@@ -10,24 +10,22 @@ const config: Config = {
     extend: {
       colors: {
         primary: {
-          DEFAULT: '#B8A9E8',
-          light: '#D4C8F0',
-          dark: '#8B7BB8',
+          DEFAULT: '#7C3AED',
+          light: '#A78BFA',
+          dark: '#5B21B6',
         },
         kids: {
-          DEFAULT: '#FEF08A',
-          dark: '#FDE047',
-          /** Текст на пастельном жёлтом — тёмный для контраста */
-          text: '#1a1a1a',
+          DEFAULT: '#FCD34D',
+          dark: '#EAB308',
+          text: '#1E293B',
         },
         sense: {
-          DEFAULT: '#7DD3CE',
-          light: '#99E5E0',
-          dark: '#5BB5B0',
-          /** Текст на пастельном teal — тёмный для контраста */
-          text: '#134E4A',
+          DEFAULT: '#10B981',
+          light: '#34D399',
+          dark: '#047857',
+          text: '#FFFFFF',
         },
-        background: '#FAF9F7',
+        background: '#F8FAFC',
       },
       fontFamily: {
         sans: ['var(--font-inter)', 'Inter', 'Roboto', 'sans-serif'],
@@ -37,13 +35,14 @@ const config: Config = {
         'heading': ['clamp(1.5rem, 3vw, 2.25rem)', { lineHeight: '1.2', fontWeight: '700' }],
       },
       boxShadow: {
-        soft: '0 4px 20px rgba(184, 169, 232, 0.15)',
-        'soft-lg': '0 8px 30px rgba(184, 169, 232, 0.18)',
+        soft: '0 4px 20px rgba(124, 58, 237, 0.1)',
+        'soft-lg': '0 8px 30px rgba(124, 58, 237, 0.12)',
       },
       backgroundImage: {
-        'gradient-primary': 'linear-gradient(135deg, #8B7BB8 0%, #B8A9E8 100%)',
-        'gradient-banner': 'linear-gradient(135deg, #8B7BB8 0%, #B8A9E8 80%)',
-        'gradient-sense': 'linear-gradient(135deg, #5BB5B0 0%, #7DD3CE 80%)',
+        'gradient-primary': 'linear-gradient(135deg, #7C3AED 0%, #A78BFA 100%)',
+        'gradient-banner': 'linear-gradient(135deg, #7C3AED 0%, #A78BFA 80%)',
+        'gradient-sense': 'linear-gradient(135deg, #10B981 0%, #34D399 80%)',
+        'gradient-kids': 'linear-gradient(135deg, #FCD34D 0%, #FBBF24 80%)',
       },
     },
   },
