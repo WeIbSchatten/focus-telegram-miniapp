@@ -19,7 +19,7 @@ const ROLE_PRIORITY: Record<string, number> = {
 export function getPrimaryRole(roles: string[] | undefined): string {
   if (!roles?.length) return UserRole.USER;
   let maxPriority = 0;
-  let primary = UserRole.USER;
+  let primary: string = UserRole.USER;
   for (const r of roles) {
     const p = ROLE_PRIORITY[r] ?? 0;
     if (p > maxPriority) {
