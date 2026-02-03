@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useCallback, useEffect, useState, useRef } from 'react';
 import { senseClient } from '@/lib/api/sense-client';
 import { Card } from '@/components/common/Card';
 import { Button } from '@/components/common/Button';
@@ -36,7 +36,7 @@ export default function SenseAdminPage() {
   const affirmationTitleRef = useRef<HTMLInputElement>(null);
   const affirmationFileRef = useRef<HTMLInputElement>(null);
 
-  const load = () => {
+  const load = useCallback(() => {
     setLoading(true);
     Promise.all([
       senseClient.meditations.list(),
@@ -54,11 +54,11 @@ export default function SenseAdminPage() {
       })
       .catch((e) => toast(e?.response?.data?.detail || 'Ошибка загрузки'))
       .finally(() => setLoading(false));
-  };
+  }, [toast]);
 
   useEffect(() => {
     load();
-  }, []);
+  }, [load]);
 
   const handleUploadMeditation = async () => {
     const title = meditationTitleRef.current?.value?.trim() || 'Медитация';

@@ -64,7 +64,7 @@ export default function ProfilePage() {
     if (user) {
       setProfileEdit({ fullName: user.fullName ?? '', email: user.email ?? '' });
     }
-  }, [user?.id, user?.fullName, user?.email]);
+  }, [user]);
 
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();

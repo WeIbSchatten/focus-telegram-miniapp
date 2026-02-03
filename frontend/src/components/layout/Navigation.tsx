@@ -6,7 +6,7 @@ import { ROUTES } from '@/lib/constants';
 import { useAuth } from '@/hooks/useAuth';
 
 export function getNavItems(hasKidsAccess: boolean, hasSenseAccess: boolean) {
-  const items = [{ href: ROUTES.home, label: 'Главная' }];
+  const items: { href: string; label: string }[] = [{ href: ROUTES.home, label: 'Главная' }];
   if (hasKidsAccess) items.push({ href: ROUTES.kids.root, label: 'Focus Kids' });
   if (hasSenseAccess) items.push({ href: ROUTES.sense.root, label: 'Focus Sense' });
   return items;
