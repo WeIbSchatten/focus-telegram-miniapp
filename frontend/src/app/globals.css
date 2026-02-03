@@ -3,15 +3,16 @@
 @tailwind utilities;
 
 :root {
-  --primary: #3e6787;
-  --primary-light: #5a7d9a;
-  --kids: #b48b8b;
-  --sense: #f4d4bd;
-  --sense-light: #f8e4d4;
-  --background: #fdf5ef;
-  --shadow-soft: 0 4px 20px rgba(62, 103, 135, 0.15);
-  --shadow-sense: 0 4px 20px rgba(244, 212, 189, 0.25);
-  --shadow-kids: 0 4px 20px rgba(180, 139, 139, 0.2);
+  --primary: #404267;
+  --primary-light: #5c5a7a;
+  --primary-dark: #201E45;
+  --kids: #F07B7B;
+  --sense: #E4E4EF;
+  --sense-light: #ebeaf2;
+  --background: #f0f0f5;
+  --shadow-soft: 0 4px 20px rgba(64, 66, 103, 0.15);
+  --shadow-sense: 0 4px 20px rgba(228, 228, 239, 0.4);
+  --shadow-kids: 0 4px 20px rgba(240, 123, 123, 0.25);
 }
 
 * {
@@ -52,7 +53,7 @@ a:hover {
   text-decoration: underline;
 }
 
-/* Кнопки и инпуты — обводка primary (teal), тёмный текст */
+/* Кнопки и инпуты — обводка primary (slate), тёмный текст */
 input, textarea, select {
   @apply border-2 border-primary/30 rounded-lg px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary;
 }
