@@ -98,16 +98,12 @@ export function Navigation() {
             </svg>
           </button>
           {menuOpen && (
-            <>
-              {/* На узких экранах — в потоке документа, без наложения */}
-              <div className="mt-1 w-full rounded-lg border border-white/30 bg-white py-1 shadow-lg md:hidden">
-                {dropdownContent}
-              </div>
-              {/* На md+ — абсолютное позиционирование, не выходит за экран */}
-              <div className="absolute left-0 top-full z-50 mt-1 min-w-[10rem] max-w-[min(20rem,calc(100vw-2rem))] rounded-lg border border-white/30 bg-white py-1 shadow-lg hidden md:block md:right-0 md:left-auto md:min-w-[12rem]">
-                {dropdownContent}
-              </div>
-            </>
+            <div
+              className="absolute right-0 top-full z-50 mt-1 min-w-[10rem] max-w-[min(20rem,calc(100vw-2rem))] rounded-lg border border-white/30 bg-white py-1 shadow-lg md:min-w-[12rem]"
+              role="menu"
+            >
+              {dropdownContent}
+            </div>
           )}
         </div>
       ) : (
