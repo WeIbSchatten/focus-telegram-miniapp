@@ -7,11 +7,11 @@
   --primary-light: #5c5a7a;
   --primary-dark: #201E45;
   --kids: #F07B7B;
-  --sense: #6D8C8E;
-  --sense-light: #8fa8aa;
+  --sense: #5B7C99;
+  --sense-light: #7A9AB5;
   --background: #f0f0f5;
   --shadow-soft: 0 4px 20px rgba(64, 66, 103, 0.15);
-  --shadow-sense: 0 4px 20px rgba(109, 140, 142, 0.25);
+  --shadow-sense: 0 4px 20px rgba(91, 124, 153, 0.25);
   --shadow-kids: 0 4px 20px rgba(240, 123, 123, 0.25);
 }
 
