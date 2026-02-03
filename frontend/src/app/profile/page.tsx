@@ -156,7 +156,7 @@ export default function ProfilePage() {
                     : role === 'teacher'
                       ? 'Учитель'
                       : (user?.roles ?? []).length
-                        ? (user.roles as string[]).map((r) => ({ admin: 'Администратор', moderator: 'Модератор', teacher: 'Учитель', student: 'Ученик', user: 'Пользователь' }[r] ?? r)).join(', ')
+                        ? (user?.roles ?? []).map((r) => ({ admin: 'Администратор', moderator: 'Модератор', teacher: 'Учитель', student: 'Ученик', user: 'Пользователь' }[r] ?? r)).join(', ')
                         : '—'}
             </p>
           </>
