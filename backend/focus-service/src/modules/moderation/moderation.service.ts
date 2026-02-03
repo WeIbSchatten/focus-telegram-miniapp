@@ -13,5 +13,9 @@ export class ModerationService {
   async setKidsAccess(userId: string, hasAccess: boolean): Promise<void> {
     await this.usersService.setKidsAccess(userId, hasAccess);
   }
+
+  async setSenseAccess(userId: string, hasAccess: boolean): Promise<void> {
+    await this.usersService.setSenseAccess(userId, hasAccess);
+  }
 }
 

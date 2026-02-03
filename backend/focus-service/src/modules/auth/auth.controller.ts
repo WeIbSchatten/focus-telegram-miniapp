@@ -2,6 +2,7 @@ import { Body, Controller, Get, HttpCode, HttpStatus, Patch, Post, UseGuards, Ba
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { TelegramAuthDto } from './dto/telegram-auth.dto';
+import { TelegramWidgetAuthDto } from './dto/telegram-widget-auth.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { UsersService } from '../users/users.service';
@@ -42,10 +43,25 @@ export class AuthController {
     return this.authService.validateUser(dto);
   }
 
-  /** Вход по Telegram WebApp initData (валидация на бэкенде). */
+  /** Вход по Telegram WebApp initData (мини-приложение). */
   @Post('telegram')
   loginTelegram(@Body() dto: TelegramAuthDto) {
     return this.authService.validateTelegramInitData(dto.initData);
+  }
+
+  /** Вход по данным Telegram Login Widget (сайт, редирект). */
+  @Post('telegram-widget')
+  @HttpCode(HttpStatus.OK)
+  loginTelegramWidget(@Body() dto: TelegramWidgetAuthDto) {
+    return this.authService.validateTelegramWidget({
+      id: dto.id,
+      first_name: dto.first_name,
+      last_name: dto.last_name,
+      username: dto.username,
+      photo_url: dto.photo_url,
+      auth_date: dto.auth_date,
+      hash: dto.hash,
+    });
   }
 
   /** Отвязать Telegram от текущего аккаунта (требует JWT). */
@@ -53,11 +69,12 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   async unlinkTelegram(
     @CurrentUser() currentUser: { userId: string },
-  ): Promise<Pick<User, 'id' | 'email' | 'fullName' | 'role' | 'status' | 'hasKidsAccess' | 'telegramUserId'>> {
+  ): Promise<Pick<User, 'id' | 'email' | 'fullName' | 'role' | 'status' | 'hasKidsAccess' | 'hasSenseAccess' | 'telegramUserId'>> {
     const updated = await this.usersService.unlinkTelegram(currentUser.userId);
-    const { id, email, fullName, role, status, hasKidsAccess, telegramUserId } = updated;
+    const { id, email, fullName, role, status, hasKidsAccess, hasSenseAccess, telegramUserId } = updated;
     const effectiveKidsAccess = hasKidsAccess || role === UserRole.ADMIN || role === UserRole.MODERATOR;
-    return { id, email, fullName, role, status, hasKidsAccess: effectiveKidsAccess, telegramUserId: telegramUserId ?? null };
+    const effectiveSenseAccess = hasSenseAccess || role === UserRole.ADMIN || role === UserRole.MODERATOR;
+    return { id, email, fullName, role, status, hasKidsAccess: effectiveKidsAccess, hasSenseAccess: effectiveSenseAccess, telegramUserId: telegramUserId ?? null };
   }
 
   /** Привязать Telegram к текущему аккаунту (требует JWT). */
@@ -86,11 +103,12 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   async me(
     @CurrentUser() user: { userId: string },
-  ): Promise<Pick<User, 'id' | 'email' | 'fullName' | 'role' | 'status' | 'hasKidsAccess' | 'telegramUserId'>> {
+  ): Promise<Pick<User, 'id' | 'email' | 'fullName' | 'role' | 'status' | 'hasKidsAccess' | 'hasSenseAccess' | 'telegramUserId'>> {
     const fullUser = await this.usersService.findById(user.userId);
-    const { id, email, fullName, role, status, hasKidsAccess, telegramUserId } = fullUser;
+    const { id, email, fullName, role, status, hasKidsAccess, hasSenseAccess, telegramUserId } = fullUser;
     const effectiveKidsAccess = hasKidsAccess || role === UserRole.ADMIN || role === UserRole.MODERATOR;
-    return { id, email, fullName, role, status, hasKidsAccess: effectiveKidsAccess, telegramUserId: telegramUserId ?? null };
+    const effectiveSenseAccess = hasSenseAccess || role === UserRole.ADMIN || role === UserRole.MODERATOR;
+    return { id, email, fullName, role, status, hasKidsAccess: effectiveKidsAccess, hasSenseAccess: effectiveSenseAccess, telegramUserId: telegramUserId ?? null };
   }
 
   @Patch('me')
@@ -98,11 +116,12 @@ export class AuthController {
   async updateProfile(
     @CurrentUser() user: { userId: string },
     @Body() dto: UpdateProfileDto,
-  ): Promise<Pick<User, 'id' | 'email' | 'fullName' | 'role' | 'status' | 'hasKidsAccess' | 'telegramUserId'>> {
+  ): Promise<Pick<User, 'id' | 'email' | 'fullName' | 'role' | 'status' | 'hasKidsAccess' | 'hasSenseAccess' | 'telegramUserId'>> {
     const updated = await this.usersService.updateProfile(user.userId, dto);
-    const { id, email, fullName, role, status, hasKidsAccess, telegramUserId } = updated;
+    const { id, email, fullName, role, status, hasKidsAccess, hasSenseAccess, telegramUserId } = updated;
     const effectiveKidsAccess = hasKidsAccess || role === UserRole.ADMIN || role === UserRole.MODERATOR;
-    return { id, email, fullName, role, status, hasKidsAccess: effectiveKidsAccess, telegramUserId: telegramUserId ?? null };
+    const effectiveSenseAccess = hasSenseAccess || role === UserRole.ADMIN || role === UserRole.MODERATOR;
+    return { id, email, fullName, role, status, hasKidsAccess: effectiveKidsAccess, hasSenseAccess: effectiveSenseAccess, telegramUserId: telegramUserId ?? null };
   }
 
   @Patch('me/password')

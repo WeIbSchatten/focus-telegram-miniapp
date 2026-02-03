@@ -17,10 +17,11 @@ export class UsersController {
   @Roles(UserRole.ADMIN, UserRole.MODERATOR)
   async list(
     @CurrentUser() currentUser: { userId: string; role: string },
-  ): Promise<Pick<User, 'id' | 'email' | 'fullName' | 'role' | 'status' | 'hasKidsAccess' | 'createdAt'>[]> {
+  ): Promise<Pick<User, 'id' | 'email' | 'fullName' | 'role' | 'status' | 'hasKidsAccess' | 'hasSenseAccess' | 'createdAt'>[]> {
     const users = await this.usersService.findAll();
     return users.map((u) => {
       const effectiveKidsAccess = u.hasKidsAccess || u.role === UserRole.ADMIN || u.role === UserRole.MODERATOR;
+      const effectiveSenseAccess = u.hasSenseAccess || u.role === UserRole.ADMIN || u.role === UserRole.MODERATOR;
       return {
         id: u.id,
         email: u.email,
@@ -28,6 +29,7 @@ export class UsersController {
         role: u.role,
         status: u.status,
         hasKidsAccess: effectiveKidsAccess,
+        hasSenseAccess: effectiveSenseAccess,
         createdAt: u.createdAt,
       };
     });
@@ -38,15 +40,16 @@ export class UsersController {
   async getById(
     @Param('id') id: string,
     @CurrentUser() currentUser: { userId: string; role: string },
-  ): Promise<Pick<User, 'id' | 'email' | 'fullName' | 'role' | 'status' | 'hasKidsAccess'>> {
+  ): Promise<Pick<User, 'id' | 'email' | 'fullName' | 'role' | 'status' | 'hasKidsAccess' | 'hasSenseAccess'>> {
     // Пользователь может получить только свою информацию, админы и модераторы - любую
     if (currentUser.userId !== id && currentUser.role !== UserRole.ADMIN && currentUser.role !== UserRole.MODERATOR) {
       throw new ForbiddenException('Доступ только к своим данным');
     }
     const user = await this.usersService.findById(id);
-    const { id: userId, email, fullName, role, status, hasKidsAccess } = user;
+    const { id: userId, email, fullName, role, status, hasKidsAccess, hasSenseAccess } = user;
     const effectiveKidsAccess = hasKidsAccess || role === UserRole.ADMIN || role === UserRole.MODERATOR;
-    return { id: userId, email, fullName, role, status, hasKidsAccess: effectiveKidsAccess };
+    const effectiveSenseAccess = hasSenseAccess || role === UserRole.ADMIN || role === UserRole.MODERATOR;
+    return { id: userId, email, fullName, role, status, hasKidsAccess: effectiveKidsAccess, hasSenseAccess: effectiveSenseAccess };
   }
 
   @Patch(':id/role')

@@ -119,6 +119,12 @@ export class UsersService {
     return this.usersRepository.save(user);
   }
 
+  async setSenseAccess(id: string, hasAccess: boolean): Promise<User> {
+    const user = await this.findById(id);
+    user.hasSenseAccess = hasAccess;
+    return this.usersRepository.save(user);
+  }
+
   async setRole(id: string, role: UserRole): Promise<User> {
     const user = await this.findById(id);
     user.role = role;
@@ -173,7 +179,8 @@ export class UsersService {
         fullName: dto.fullName,
         role: dto.role,
         status: UserStatus.APPROVED,
-        hasKidsAccess: true, // администратор и модератор получают доступ к Focus Kids без одобрения
+        hasKidsAccess: true,
+        hasSenseAccess: true,
       });
       await this.usersRepository.save(user);
     }

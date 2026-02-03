@@ -33,6 +33,9 @@ export class User {
   @Column({ type: 'boolean', default: false })
   hasKidsAccess!: boolean;
 
+  @Column({ type: 'boolean', default: true })
+  hasSenseAccess!: boolean;
+
   @CreateDateColumn()
   createdAt!: Date;
 

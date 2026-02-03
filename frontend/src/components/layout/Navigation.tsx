@@ -5,15 +5,18 @@ import { useRouter, usePathname } from 'next/navigation';
 import { ROUTES } from '@/lib/constants';
 import { useAuth } from '@/hooks/useAuth';
 
-const navItems = [
-  { href: ROUTES.home, label: 'Главная' },
-  { href: ROUTES.kids.root, label: 'Focus Kids' },
-];
+export function getNavItems(hasKidsAccess: boolean, hasSenseAccess: boolean) {
+  const items = [{ href: ROUTES.home, label: 'Главная' }];
+  if (hasKidsAccess) items.push({ href: ROUTES.kids.root, label: 'Focus Kids' });
+  if (hasSenseAccess) items.push({ href: ROUTES.sense.root, label: 'Focus Sense' });
+  return items;
+}
 
 export function Navigation() {
   const router = useRouter();
   const pathname = usePathname();
-  const { isAuthenticated, user, logout } = useAuth();
+  const { isAuthenticated, user, hasKidsAccess, hasSenseAccess, logout } = useAuth();
+  const navItems = getNavItems(hasKidsAccess, hasSenseAccess);
 
   const handleLogout = () => {
     logout();
@@ -35,7 +38,12 @@ export function Navigation() {
       ))}
       {isAuthenticated ? (
         <>
-          <span className="text-white md:ml-2 opacity-95">{user?.fullName}</span>
+          <Link
+            href={ROUTES.profile}
+            className="font-medium text-white md:ml-2 opacity-95 transition hover:opacity-100 hover:underline"
+          >
+            {user?.fullName}
+          </Link>
           <button
             type="button"
             onClick={handleLogout}

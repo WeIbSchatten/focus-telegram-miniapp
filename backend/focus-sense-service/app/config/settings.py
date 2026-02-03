@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     APP_PORT: int = 8000
     APP_DATABASE_URL: str
     APP_JWT_SECRET: str
+    FOCUS_SERVICE_URL: str = "http://localhost:3001"
     # Доп. CORS-истоки (через запятую), например URL туннеля для Mini App
     CORS_ORIGINS_EXTRA: str = ""
     # Максимальный размер аудиофайла (байты). 5 МБ

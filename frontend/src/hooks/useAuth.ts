@@ -64,14 +64,24 @@ export function useAuth() {
     }
   }, [accessToken, user, refreshMe]);
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (!accessToken) return;
+    if ((window as unknown as { __focusRefreshed?: boolean }).__focusRefreshed) return;
+    (window as unknown as { __focusRefreshed?: boolean }).__focusRefreshed = true;
+    refreshMe();
+  }, [accessToken, refreshMe]);
+
   const isAuthenticated = Boolean(accessToken);
   const hasKidsAccess = user?.hasKidsAccess ?? false;
+  const hasSenseAccess = user?.hasSenseAccess ?? false;
 
   return {
     accessToken,
     user,
     isAuthenticated,
     hasKidsAccess,
+    hasSenseAccess,
     login,
     register,
     loginTelegram,

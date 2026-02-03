@@ -10,8 +10,7 @@ from app.config.database import get_db
 from app.config.settings import settings
 from app.models.affirmation import Affirmation
 from app.schemas.affirmation import AffirmationRead, AffirmationCreate, AffirmationUpdate
-from app.core.security import get_current_user
-from app.dependencies.auth import require_admin_or_moderator
+from app.dependencies.auth import require_admin_or_moderator, verify_sense_access
 from app.services.audio_compress import compress_audio_to_mp3
 
 router = APIRouter(prefix="/affirmations", tags=["affirmations"])
@@ -30,7 +29,7 @@ def _affirmations_dir() -> Path:
 @router.get("", response_model=list[AffirmationRead])
 def list_affirmations(
     db: Session = Depends(get_db),
-    _user=Depends(get_current_user),
+    _user=Depends(verify_sense_access),
 ):
     return db.query(Affirmation).order_by(Affirmation.order, Affirmation.id).all()
 
@@ -39,7 +38,7 @@ def list_affirmations(
 def get_affirmation_audio(
     affirmation_id: int,
     db: Session = Depends(get_db),
-    _user=Depends(get_current_user),
+    _user=Depends(verify_sense_access),
 ):
     affirmation = db.query(Affirmation).filter(Affirmation.id == affirmation_id).first()
     if not affirmation:

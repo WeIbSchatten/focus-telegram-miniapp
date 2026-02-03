@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
@@ -9,7 +9,7 @@ import { useToast } from '@/hooks/useToast';
 import { Input } from '@/components/common/Input';
 import { Button } from '@/components/common/Button';
 import { Card } from '@/components/common/Card';
-import { ROUTES } from '@/lib/constants';
+import { ROUTES, TELEGRAM_BOT_NAME } from '@/lib/constants';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -22,6 +22,22 @@ export default function LoginPage() {
   const [tgLoading, setTgLoading] = useState(false);
   const [error, setError] = useState('');
   const [needLink, setNeedLink] = useState(false);
+  const telegramWidgetRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (inside || !TELEGRAM_BOT_NAME || !telegramWidgetRef.current) return;
+    if (telegramWidgetRef.current.children.length > 0) return;
+    const script = document.createElement('script');
+    script.src = 'https://telegram.org/js/telegram-widget.js?22';
+    script.setAttribute('data-telegram-login', TELEGRAM_BOT_NAME);
+    script.setAttribute('data-size', 'large');
+    script.setAttribute(
+      'data-auth-url',
+      `${window.location.origin}${ROUTES.auth.telegramCallback}`
+    );
+    script.async = true;
+    telegramWidgetRef.current.appendChild(script);
+  }, [inside]);
 
   if (isAuthenticated) {
     router.push(ROUTES.home);
@@ -98,6 +114,13 @@ export default function LoginPage() {
             </Button>
             <p className="mt-4 text-center text-sm text-gray-600">или</p>
           </div>
+        )}
+
+        {!inside && TELEGRAM_BOT_NAME && (
+          <div className="mt-6 flex justify-center" ref={telegramWidgetRef} />
+        )}
+        {!inside && TELEGRAM_BOT_NAME && (
+          <p className="mt-4 text-center text-sm text-gray-600">или</p>
         )}
 
         {needLink && inside && initData && (

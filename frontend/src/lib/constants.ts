@@ -6,9 +6,16 @@ export const TELEGRAM_BOT_NAME = process.env.NEXT_PUBLIC_TELEGRAM_BOT_NAME || ''
 
 export const ROUTES = {
   home: '/',
+  profile: '/profile',
   auth: {
     login: '/auth/login',
     register: '/auth/register',
+    telegramCallback: '/auth/telegram-callback',
+  },
+  admin: {
+    root: '/admin',
+    users: '/admin/users',
+    register: '/admin/register',
   },
   license: '/license',
   sense: {
@@ -16,6 +23,7 @@ export const ROUTES = {
     meditations: '/sense/meditations',
     affirmations: '/sense/affirmations',
     admin: '/sense/admin',
+    adminUsers: '/sense/admin/users',
   },
   kids: {
     root: '/kids',

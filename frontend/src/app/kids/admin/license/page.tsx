@@ -87,7 +87,7 @@ export default function AdminLicensePage() {
               Посмотреть на сайте
             </Button>
           </Link>
-          <Link href={ROUTES.kids.admin.users}>
+          <Link href={ROUTES.admin.users}>
             <Button type="button" variant="ghost">
               К управлению
             </Button>

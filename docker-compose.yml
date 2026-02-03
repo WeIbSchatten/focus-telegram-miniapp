@@ -47,9 +47,11 @@ services:
     container_name: focus-sense-service
     depends_on:
       - focus-db
+      - focus-service
     env_file:
       - ./backend/focus-sense-service/.env
     environment:
+      - FOCUS_SERVICE_URL=http://focus-service:3000
       - CORS_ORIGINS_EXTRA=${CORS_ORIGINS_EXTRA:-https://09e52bf30fd6d5.lhr.life}
     ports:
       - "8002:8000"

@@ -8,8 +8,14 @@ import { Navigation } from './Navigation';
 
 export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const { isAuthenticated, hasKidsAccess } = useAuth();
-  const logoHref = isAuthenticated && hasKidsAccess ? ROUTES.kids.root : ROUTES.home;
+  const { isAuthenticated, hasKidsAccess, hasSenseAccess } = useAuth();
+  const logoHref = isAuthenticated
+    ? hasKidsAccess
+      ? ROUTES.kids.root
+      : hasSenseAccess
+        ? ROUTES.sense.root
+        : ROUTES.home
+    : ROUTES.home;
 
   return (
     <header className="sticky top-0 z-40 w-full bg-gradient-banner shadow-soft">

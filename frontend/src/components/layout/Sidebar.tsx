@@ -7,7 +7,7 @@ import { useAuth } from '@/hooks/useAuth';
 
 const kidsNav = [
   { href: ROUTES.kids.root, label: 'Главная' },
-  { href: ROUTES.kids.profile, label: 'Личный кабинет' },
+  { href: ROUTES.profile, label: 'Личный кабинет' },
   { href: ROUTES.kids.learning, label: 'Обучение' },
   { href: ROUTES.kids.attendance, label: 'Посещаемость' },
   { href: ROUTES.kids.lessons, label: 'Уроки' },
@@ -15,7 +15,7 @@ const kidsNav = [
 ];
 
 const adminNav = [
-  { href: ROUTES.kids.admin.users, label: 'Пользователи' },
+  { href: ROUTES.admin.users, label: 'Пользователи' },
   { href: ROUTES.kids.admin.students, label: 'Ученики' },
   { href: ROUTES.kids.admin.teachers, label: 'Преподаватели' },
   { href: ROUTES.kids.admin.groups, label: 'Группы' },

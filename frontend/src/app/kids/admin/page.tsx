@@ -7,7 +7,7 @@ import { ROUTES } from '@/lib/constants';
 export default function KidsAdminPage() {
   const router = useRouter();
   useEffect(() => {
-    router.replace(ROUTES.kids.admin.users);
+    router.replace(ROUTES.admin.users);
   }, [router]);
   return null;
 }

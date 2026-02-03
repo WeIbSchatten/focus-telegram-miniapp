@@ -11,7 +11,10 @@ const senseNav = [
   { href: ROUTES.sense.affirmations, label: 'Аффирмации' },
 ];
 
-const senseAdminNav = [{ href: ROUTES.sense.admin, label: 'Управление контентом' }];
+const senseAdminNav = [
+  { href: ROUTES.sense.admin, label: 'Управление контентом' },
+  { href: ROUTES.admin.users, label: 'Пользователи' },
+];
 
 export function SidebarSense() {
   const pathname = usePathname();

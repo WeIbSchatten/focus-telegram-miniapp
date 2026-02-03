@@ -14,8 +14,7 @@ from app.schemas.content import (
     WeeklyIntentionListUpdate,
     DailyQuestionListUpdate,
 )
-from app.core.security import get_current_user
-from app.dependencies.auth import require_admin_or_moderator
+from app.dependencies.auth import require_admin_or_moderator, verify_sense_access
 
 router = APIRouter(prefix="/content", tags=["content"])
 
@@ -39,7 +38,7 @@ def _day_seed(d: date) -> str:
 @router.get("/weekly-intention", response_model=WeeklyIntentionRead | None)
 def get_random_weekly_intention(
     db: Session = Depends(get_db),
-    _user=Depends(get_current_user),
+    _user=Depends(verify_sense_access),
 ):
     """Одна случайная установка на текущую неделю. Обновляется в 00:00 понедельника."""
     seed = _week_seed(date.today())
@@ -62,7 +61,7 @@ def get_random_weekly_intention(
 @router.get("/daily-question", response_model=DailyQuestionRead | None)
 def get_random_daily_question(
     db: Session = Depends(get_db),
-    _user=Depends(get_current_user),
+    _user=Depends(verify_sense_access),
 ):
     """Один случайный вопрос на сегодня. Обновляется в 00:00 каждый день."""
     seed = _day_seed(date.today())

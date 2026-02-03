@@ -8,6 +8,7 @@ export interface FocusUser {
   role: UserRole;
   status: UserStatus;
   hasKidsAccess: boolean;
+  hasSenseAccess?: boolean;
   /** Привязка Telegram: id пользователя в Telegram (если привязан). */
   telegramUserId?: string;
 }

@@ -57,6 +57,7 @@ echo "Created $ROOT/backend/focus-kids-service/.env"
 cat > backend/focus-sense-service/.env << EOF
 APP_DATABASE_URL=postgresql://focus:$POSTGRES_PASSWORD@focus-db:5432/focus_db
 APP_JWT_SECRET=$APP_JWT_SECRET
+FOCUS_SERVICE_URL=http://focus-service:3000
 CORS_ORIGINS_EXTRA=https://focusvn.mooo.com
 EOF
 echo "Created $ROOT/backend/focus-sense-service/.env"

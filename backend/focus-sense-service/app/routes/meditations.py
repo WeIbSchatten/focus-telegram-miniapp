@@ -10,8 +10,7 @@ from app.config.database import get_db
 from app.config.settings import settings
 from app.models.meditation import Meditation
 from app.schemas.meditation import MeditationRead, MeditationCreate, MeditationUpdate
-from app.core.security import get_current_user
-from app.dependencies.auth import require_admin_or_moderator
+from app.dependencies.auth import require_admin_or_moderator, verify_sense_access
 from app.services.audio_compress import compress_audio_to_mp3
 
 router = APIRouter(prefix="/meditations", tags=["meditations"])
@@ -30,7 +29,7 @@ def _meditations_dir() -> Path:
 @router.get("", response_model=list[MeditationRead])
 def list_meditations(
     db: Session = Depends(get_db),
-    _user=Depends(get_current_user),
+    _user=Depends(verify_sense_access),
 ):
     return db.query(Meditation).order_by(Meditation.order, Meditation.id).all()
 
@@ -39,7 +38,7 @@ def list_meditations(
 def get_meditation_audio(
     meditation_id: int,
     db: Session = Depends(get_db),
-    _user=Depends(get_current_user),
+    _user=Depends(verify_sense_access),
 ):
     meditation = db.query(Meditation).filter(Meditation.id == meditation_id).first()
     if not meditation:

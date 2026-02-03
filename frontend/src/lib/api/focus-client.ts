@@ -10,17 +10,27 @@ export const focusClient = {
       focusApi.post<FocusUser>('/auth/register', data).then((r) => r.data),
     telegram: (initData: string) =>
       focusApi.post<AuthResponse>('/auth/telegram', { initData }).then((r) => r.data),
+    telegramWidget: (params: {
+      id: string;
+      first_name: string;
+      last_name?: string;
+      username?: string;
+      photo_url?: string;
+      auth_date: string;
+      hash: string;
+    }) =>
+      focusApi.post<AuthResponse>('/auth/telegram-widget', params).then((r) => r.data),
     me: () =>
-      focusApi.get<Pick<FocusUser, 'id' | 'email' | 'fullName' | 'role' | 'status' | 'hasKidsAccess' | 'telegramUserId'>>('/auth/me').then((r) => r.data),
+      focusApi.get<Pick<FocusUser, 'id' | 'email' | 'fullName' | 'role' | 'status' | 'hasKidsAccess' | 'hasSenseAccess' | 'telegramUserId'>>('/auth/me').then((r) => r.data),
     linkTelegram: (initData: string) =>
       focusApi.patch<{ telegramUserId: string }>('/auth/me/link-telegram', { initData }).then((r) => r.data),
     unlinkTelegram: () =>
       focusApi
-        .patch<Pick<FocusUser, 'id' | 'email' | 'fullName' | 'role' | 'status' | 'hasKidsAccess' | 'telegramUserId'>>('/auth/me/unlink-telegram')
+        .patch<Pick<FocusUser, 'id' | 'email' | 'fullName' | 'role' | 'status' | 'hasKidsAccess' | 'hasSenseAccess' | 'telegramUserId'>>('/auth/me/unlink-telegram')
         .then((r) => r.data),
     updateProfile: (data: { fullName?: string; email?: string }) =>
       focusApi
-        .patch<Pick<FocusUser, 'id' | 'email' | 'fullName' | 'role' | 'status' | 'hasKidsAccess' | 'telegramUserId'>>('/auth/me', data)
+        .patch<Pick<FocusUser, 'id' | 'email' | 'fullName' | 'role' | 'status' | 'hasKidsAccess' | 'hasSenseAccess' | 'telegramUserId'>>('/auth/me', data)
         .then((r) => r.data),
     changePassword: (data: { oldPassword: string; newPassword: string; confirmNewPassword: string }) =>
       focusApi.patch<{ message: string }>('/auth/me/password', data).then((r) => r.data),
@@ -40,6 +50,8 @@ export const focusClient = {
       focusApi.patch(`/moderation/users/${userId}/approve`, { status }).then((r) => r.data),
     setKidsAccess: (userId: string, hasAccess: boolean) =>
       focusApi.patch<{ hasAccess: boolean }>(`/moderation/users/${userId}/kids-access`, { hasAccess }).then((r) => r.data),
+    setSenseAccess: (userId: string, hasAccess: boolean) =>
+      focusApi.patch<{ hasAccess: boolean }>(`/moderation/users/${userId}/sense-access`, { hasAccess }).then((r) => r.data),
   },
   content: {
     getLicense: () => focusApi.get<{ content: string }>('/content/license').then((r) => r.data),
