@@ -118,9 +118,26 @@ export default function LoginPage() {
 
         {!inside && (
           <div className="mt-6">
-            <p className="mb-2 text-center text-sm font-medium text-gray-700">Войти через Telegram</p>
+            <p className="mb-3 text-center text-sm font-medium text-gray-700">Войти через Telegram</p>
             {TELEGRAM_BOT_NAME ? (
-              <div className="flex min-h-[44px] justify-center" ref={telegramWidgetRef} />
+              <>
+                <div className="flex flex-col items-stretch gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const origin = typeof window !== 'undefined' ? window.location.origin : '';
+                      window.location.href = `https://oauth.telegram.org/embed/${TELEGRAM_BOT_NAME}?origin=${encodeURIComponent(origin)}`;
+                    }}
+                    className="inline-flex justify-center rounded-lg border-2 border-[#0088cc] bg-[#0088cc] px-4 py-2.5 text-center font-semibold text-white transition hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0088cc] focus-visible:ring-offset-2"
+                  >
+                    Войти через Telegram
+                  </button>
+                  <p className="text-center text-xs text-gray-500">
+                    Откроется страница Telegram для входа. После авторизации вы вернётесь на сайт.
+                  </p>
+                </div>
+                <div className="mt-3 flex min-h-[44px] justify-center" ref={telegramWidgetRef} />
+              </>
             ) : (
               <p className="rounded-lg bg-amber-50 px-3 py-2 text-center text-xs text-amber-800">
                 Для отображения кнопки входа через Telegram укажите <code className="rounded bg-amber-100 px-1">NEXT_PUBLIC_TELEGRAM_BOT_NAME</code> в настройках приложения (имя бота без @).

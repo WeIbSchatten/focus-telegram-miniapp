@@ -280,7 +280,7 @@ export default function PlatformAdminUsersPage() {
                     <div className="flex flex-col items-end gap-1.5">
                       <Button
                         variant="outline"
-                        className="min-w-0 shrink-0 px-2.5 py-1 text-xs"
+                        className="h-8 min-w-[8.5rem] shrink-0 px-3 py-1.5 text-xs"
                         onClick={() => handleKidsAccess(u.id, !u.hasKidsAccess)}
                         disabled={
                           updating === u.id ||
@@ -292,7 +292,7 @@ export default function PlatformAdminUsersPage() {
                       </Button>
                       <Button
                         variant="outline"
-                        className="min-w-0 shrink-0 border-red-200 px-2.5 py-1 text-xs text-red-600 hover:bg-red-50"
+                        className="h-8 min-w-[8.5rem] shrink-0 border-red-200 px-3 py-1.5 text-xs text-red-600 hover:bg-red-50"
                         onClick={() => handleDelete(u)}
                         disabled={updating === u.id || u.id === user?.id}
                         title={
