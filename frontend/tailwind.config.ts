@@ -21,10 +21,10 @@ const config: Config = {
           text: '#1a1a1a',
         },
         sense: {
-          DEFAULT: '#E4E4EF',
-          light: '#ebeaf2',
-          dark: '#d4d4e4',
-          text: '#201E45',
+          DEFAULT: '#99B898',
+          light: '#b5cfb4',
+          dark: '#7a9d79',
+          text: '#1e3d1e',
         },
         background: '#f0f0f5',
       },
@@ -38,7 +38,7 @@ const config: Config = {
       boxShadow: {
         soft: '0 4px 20px rgba(64, 66, 103, 0.15)',
         'soft-lg': '0 8px 30px rgba(64, 66, 103, 0.18)',
-        sense: '0 4px 20px rgba(228, 228, 239, 0.4)',
+        sense: '0 4px 20px rgba(153, 184, 152, 0.25)',
         kids: '0 4px 20px rgba(240, 123, 123, 0.25)',
       },
       backgroundImage: {
