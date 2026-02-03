@@ -24,6 +24,11 @@ export function Footer() {
                   Focus Kids — английский для детей
                 </Link>
               </li>
+              <li>
+                <Link href={ROUTES.sense.root} className="text-sense-light hover:opacity-90 transition font-medium">
+                  Focus Sense — медитации и аффирмации
+                </Link>
+              </li>
             </ul>
           </div>
           <div>
