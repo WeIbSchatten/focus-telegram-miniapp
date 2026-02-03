@@ -3,14 +3,14 @@
 @tailwind utilities;
 
 :root {
-  --primary: #7109AA;
-  --primary-light: #A855F7;
-  --kids: #FFD300;
-  --sense: #0D9488;
-  --sense-light: #14B8A6;
-  --background: #FFFFFF;
-  --shadow-soft: 0 4px 20px rgba(113, 9, 170, 0.1);
-  --shadow-sense: 0 4px 20px rgba(13, 148, 136, 0.15);
+  --primary: #B8A9E8;
+  --primary-light: #D4C8F0;
+  --kids: #FEF08A;
+  --sense: #7DD3CE;
+  --sense-light: #99E5E0;
+  --background: #FAF9F7;
+  --shadow-soft: 0 4px 20px rgba(184, 169, 232, 0.15);
+  --shadow-sense: 0 4px 20px rgba(125, 211, 206, 0.2);
 }
 
 * {
@@ -65,9 +65,9 @@ button.primary {
 }
 
 button.kids {
-  @apply bg-kids text-primary-dark font-semibold rounded-lg px-6 py-2.5 shadow-soft hover:opacity-95 transition;
+  @apply bg-kids text-kids-text font-semibold rounded-lg px-6 py-2.5 shadow-soft hover:opacity-95 transition;
 }
 
 button.sense {
-  @apply bg-sense text-white font-semibold rounded-lg px-6 py-2.5 shadow-sense hover:opacity-95 transition;
+  @apply bg-sense text-sense-text font-semibold rounded-lg px-6 py-2.5 shadow-sense hover:opacity-95 transition;
 }
