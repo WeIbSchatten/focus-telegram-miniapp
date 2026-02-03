@@ -63,7 +63,7 @@ export default function PlatformAdminUsersPage() {
     return () => {
       cancelled = true;
     };
-  }, [user?.roles, router, toast]);
+  }, [user, router, toast]);
 
   const handleKidsAccess = async (userId: string, hasAccess: boolean) => {
     setUpdating(userId);
@@ -86,7 +86,7 @@ export default function PlatformAdminUsersPage() {
     if (!targetUser) return;
     const currentRoles = targetUser.roles ?? [];
     const newRoles = checked
-      ? [...new Set([...currentRoles, role])]
+      ? Array.from(new Set([...currentRoles, role]))
       : currentRoles.filter((r) => r !== role);
     const rolesToSave = newRoles.length ? newRoles : ['user'];
     setUpdating(userId);
