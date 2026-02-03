@@ -28,6 +28,24 @@ export default function AdminTeachersPage() {
   const [formFullName, setFormFullName] = useState('');
   const [formFocusUserId, setFormFocusUserId] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
+
+  const handleDelete = async (teacher: TeacherRow) => {
+    if (!confirm(`Удалить преподавателя «${teacher.full_name}» из списка?`)) return;
+    setDeletingId(teacher.id);
+    try {
+      await kidsClient.teachers.delete(teacher.id);
+      setTeachers((prev) => prev.filter((t) => t.id !== teacher.id));
+      toast('Преподаватель удалён');
+    } catch (err: unknown) {
+      const msg = err && typeof err === 'object' && 'response' in err
+        ? (err as { response?: { data?: { detail?: string } } }).response?.data?.detail
+        : 'Не удалось удалить';
+      toast(Array.isArray(msg) ? msg[0] : String(msg));
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   useEffect(() => {
     if (!user?.roles?.includes('admin') && !user?.roles?.includes('moderator')) {
@@ -98,6 +116,7 @@ export default function AdminTeachersPage() {
                 <th className="py-2 pr-4">ID</th>
                 <th className="py-2 pr-4">ФИО</th>
                 <th className="py-2 pr-4">Focus User ID</th>
+                <th className="py-2 pl-4 text-right">Действия</th>
               </tr>
             </thead>
             <tbody>
@@ -106,6 +125,17 @@ export default function AdminTeachersPage() {
                   <td className="py-2 pr-4">{t.id}</td>
                   <td className="py-2 pr-4">{t.full_name}</td>
                   <td className="py-2 pr-4 font-mono text-xs">{t.focus_user_id}</td>
+                  <td className="py-2 pl-4 text-right">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="text-red-600 border-red-200 hover:bg-red-50"
+                      onClick={() => handleDelete(t)}
+                      disabled={deletingId === t.id}
+                    >
+                      {deletingId === t.id ? '…' : 'Удалить'}
+                    </Button>
+                  </td>
                 </tr>
               ))}
             </tbody>

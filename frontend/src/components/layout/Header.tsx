@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { ROUTES } from '@/lib/constants';
 import { useAuth } from '@/hooks/useAuth';
@@ -8,14 +9,15 @@ import { Navigation } from './Navigation';
 
 export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const pathname = usePathname();
   const { isAuthenticated, hasKidsAccess, hasSenseAccess } = useAuth();
-  const logoHref = isAuthenticated
-    ? hasKidsAccess
-      ? ROUTES.kids.root
-      : hasSenseAccess
-        ? ROUTES.sense.root
-        : ROUTES.home
-    : ROUTES.home;
+
+  const logoHref = (() => {
+    if (!isAuthenticated) return ROUTES.home;
+    if (pathname.startsWith('/sense') && hasSenseAccess) return ROUTES.sense.root;
+    if (pathname.startsWith('/kids') && hasKidsAccess) return ROUTES.kids.root;
+    return hasKidsAccess ? ROUTES.kids.root : hasSenseAccess ? ROUTES.sense.root : ROUTES.home;
+  })();
 
   return (
     <header className="sticky top-0 z-40 w-full bg-gradient-banner shadow-soft">
