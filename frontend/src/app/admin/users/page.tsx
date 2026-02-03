@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import { focusClient } from '@/lib/api/focus-client';
+import { kidsClient } from '@/lib/api/kids-client';
 import { Card } from '@/components/common/Card';
 import { Button } from '@/components/common/Button';
 import { Loader } from '@/components/common/Loader';
@@ -31,6 +32,15 @@ export default function PlatformAdminUsersPage() {
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState<string | null>(null);
   const isAdmin = user?.role === 'admin';
+
+  const loadUsers = useCallback(() => {
+    setLoading(true);
+    focusClient.users
+      .list()
+      .then((list) => setUsers(list))
+      .catch(() => toast('Не удалось загрузить пользователей'))
+      .finally(() => setLoading(false));
+  }, [toast]);
 
   useEffect(() => {
     if (user?.role !== 'admin' && user?.role !== 'moderator') {
@@ -69,12 +79,39 @@ export default function PlatformAdminUsersPage() {
 
   const handleSetRole = async (userId: string, role: string) => {
     if (!isAdmin) return;
+    const targetUser = users.find((u) => u.id === userId);
+    if (!targetUser) return;
     setUpdating(userId);
     try {
       await focusClient.users.setRole(userId, role);
-      setUsers((prev) =>
-        prev.map((u) => (u.id === userId ? { ...u, role: role as FocusUser['role'] } : u))
-      );
+      if (role === 'teacher') {
+        try {
+          const teachers = await kidsClient.teachers.list();
+          if (!teachers.some((t) => t.focus_user_id === userId)) {
+            await kidsClient.teachers.create({
+              focus_user_id: userId,
+              full_name: targetUser.fullName || targetUser.email,
+            });
+          }
+        } catch {
+          // уже есть или нет доступа к Kids — роль в Focus обновлена
+        }
+      }
+      if (role === 'student') {
+        try {
+          const students = await kidsClient.students.list();
+          if (!students.some((s) => s.focus_user_id === userId)) {
+            await kidsClient.students.create({
+              focus_user_id: userId,
+              full_name: targetUser.fullName || targetUser.email,
+              group_id: undefined,
+            });
+          }
+        } catch {
+          // уже есть или нет доступа к Kids — роль в Focus обновлена
+        }
+      }
+      await loadUsers();
       toast('Роль обновлена');
     } catch {
       toast('Ошибка изменения роли');
@@ -121,6 +158,13 @@ export default function PlatformAdminUsersPage() {
 
   return (
     <div className="mx-auto max-w-6xl space-y-6 px-4 py-8">
+      <button
+        type="button"
+        onClick={() => router.back()}
+        className="text-sm font-medium text-primary hover:underline"
+      >
+        ← Назад
+      </button>
       <PageHeader
         title="Управление пользователями"
         actions={
@@ -137,6 +181,7 @@ export default function PlatformAdminUsersPage() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-primary/20 text-left text-gray-700">
+                <th className="py-2 pr-4">ID</th>
                 <th className="py-2 pr-4">Email</th>
                 <th className="py-2 pr-4">ФИО</th>
                 <th className="py-2 pr-4">Роль</th>
@@ -147,6 +192,7 @@ export default function PlatformAdminUsersPage() {
             <tbody>
               {users.map((u) => (
                 <tr key={u.id} className="border-b border-gray-100 text-gray-800">
+                  <td className="py-2 pr-4 font-mono text-xs text-gray-500">{u.id}</td>
                   <td className="py-2 pr-4">{u.email}</td>
                   <td className="py-2 pr-4">{u.fullName}</td>
                   <td className="py-2 pr-4">

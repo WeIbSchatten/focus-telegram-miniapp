@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { useKidsStore } from '@/store/kidsStore';
 import { useToast } from '@/hooks/useToast';
@@ -16,6 +17,7 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import type { TeacherStatistics } from '@/types/kids';
 
 export default function ProfilePage() {
+  const router = useRouter();
   const { user, linkTelegram, unlinkTelegram, refreshMe } = useAuth();
   const { setUser } = useAuthStore();
   const { role, studentId, teacherId } = useKidsStore();
@@ -138,6 +140,13 @@ export default function ProfilePage() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-8 px-4 py-8">
+      <button
+        type="button"
+        onClick={() => router.back()}
+        className="text-sm font-medium text-primary hover:underline"
+      >
+        ← Назад
+      </button>
       <PageHeader
         title="Личный кабинет"
         description={
