@@ -44,12 +44,12 @@ export function ServicesList() {
       </div>
       {!isAuthenticated && (
         <p className="mt-6 text-center text-gray-700">
-          Войдите или зарегистрируйтесь, чтобы получить доступ к сервисам после одобрения модератора.
+          Войдите или зарегистрируйтесь, чтобы получить доступ к сервисам.
         </p>
       )}
       {isAuthenticated && !hasKidsAccess && (
         <p className="mt-6 rounded-lg bg-primary/10 p-4 text-center font-medium text-primary">
-          Доступ к Focus Kids откроется после одобрения заявки модератором.
+          Доступ к Focus Kids откроется после одобрения модератором.
         </p>
       )}
     </section>
