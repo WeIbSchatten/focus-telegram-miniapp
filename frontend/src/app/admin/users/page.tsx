@@ -144,8 +144,13 @@ export default function PlatformAdminUsersPage() {
 
       await loadUsers();
       toast('Роли обновлены');
-    } catch {
-      toast('Ошибка изменения ролей');
+    } catch (err: unknown) {
+      const msg =
+        err && typeof err === 'object' && err !== null && 'response' in err
+          ? (err as { response?: { data?: { message?: string | string[] } } }).response?.data?.message
+          : undefined;
+      const text = Array.isArray(msg) ? msg[0] : typeof msg === 'string' ? msg : null;
+      toast(text || (err instanceof Error ? err.message : 'Ошибка изменения ролей'));
     } finally {
       setUpdating(null);
     }

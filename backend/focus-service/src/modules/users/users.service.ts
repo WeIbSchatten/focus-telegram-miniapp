@@ -128,7 +128,11 @@ export class UsersService {
 
   async setRoles(id: string, roles: string[]): Promise<User> {
     const user = await this.findById(id);
-    user.roles = roles?.length ? roles : [UserRole.USER];
+    const validRoles = Object.values(UserRole) as string[];
+    const normalized = Array.isArray(roles)
+      ? roles.filter((r) => typeof r === 'string' && validRoles.includes(r))
+      : [];
+    user.roles = normalized.length > 0 ? normalized : [UserRole.USER];
     return this.usersRepository.save(user);
   }
 

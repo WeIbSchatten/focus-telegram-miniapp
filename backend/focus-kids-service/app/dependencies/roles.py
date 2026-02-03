@@ -22,6 +22,16 @@ def get_current_kids_role(
   if not focus_user_id:
     raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Неверный токен")
 
+  # Администратор и модератор всегда имеют права учителя для управления (удаление преподавателей, учеников и т.д.)
+  jwt_role = current_user.get("role")
+  if jwt_role in ("admin", "moderator"):
+    return {
+      "role": "teacher",
+      "focus_user_id": focus_user_id,
+      "teacher_id": None,
+      "student_id": None,
+    }
+
   teacher = db.query(Teacher).filter(Teacher.focus_user_id == focus_user_id).first()
   if teacher:
     return {
@@ -38,16 +48,6 @@ def get_current_kids_role(
       "focus_user_id": focus_user_id,
       "teacher_id": None,
       "student_id": student.id,
-    }
-
-  # Администратор и модератор имеют права учителя для управления учениками, группами, преподавателями
-  jwt_role = current_user.get("role")
-  if jwt_role in ("admin", "moderator"):
-    return {
-      "role": "teacher",
-      "focus_user_id": focus_user_id,
-      "teacher_id": None,
-      "student_id": None,
     }
 
   raise HTTPException(

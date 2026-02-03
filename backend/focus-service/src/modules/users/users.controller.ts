@@ -35,6 +35,17 @@ export class UsersController {
     });
   }
 
+  @Patch(':id/roles')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  async setRoles(
+    @Param('id') id: string,
+    @Body() body: SetRolesDto,
+  ): Promise<Pick<User, 'id' | 'roles'>> {
+    const user = await this.usersService.setRoles(id, body.roles);
+    return { id: user.id, roles: user.roles };
+  }
+
   @Get(':id')
   @UseGuards(JwtAuthGuard)
   async getById(
@@ -49,17 +60,6 @@ export class UsersController {
     const effectiveKidsAccess = hasKidsAccess || hasRole(roles, UserRole.ADMIN) || hasRole(roles, UserRole.MODERATOR);
     const effectiveSenseAccess = hasSenseAccess || hasRole(roles, UserRole.ADMIN) || hasRole(roles, UserRole.MODERATOR);
     return { id: userId, email, fullName, roles, status, hasKidsAccess: effectiveKidsAccess, hasSenseAccess: effectiveSenseAccess };
-  }
-
-  @Patch(':id/roles')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
-  async setRoles(
-    @Param('id') id: string,
-    @Body() body: SetRolesDto,
-  ): Promise<Pick<User, 'id' | 'roles'>> {
-    const user = await this.usersService.setRoles(id, body.roles);
-    return { id: user.id, roles: user.roles };
   }
 
   @Delete(':id')
