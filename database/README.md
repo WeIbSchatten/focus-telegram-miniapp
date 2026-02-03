@@ -58,6 +58,16 @@ ALTER TABLE grades ALTER COLUMN comment TYPE VARCHAR(500);
 
 Без этой миграции запросы к посещаемости/обратной связи (grades) будут возвращать 500.
 
+### Миграция 06: замена одной роли на массив ролей (users.roles)
+
+При обновлении **focus-service** до версии с несколькими ролями у пользователя выполните:
+
+```bash
+docker exec -i focus-db psql -U focus -d focus_db < database/init-scripts/06-user-roles.sql
+```
+
+Скрипт добавляет колонку `roles`, переносит данные из `role` и удаляет колонку `role`. Для новой БД (без таблицы users или без колонки role) скрипт безопасен.
+
 ### Миграция для тестов (max_attempts)
 
 Если таблица `tests` уже существовала до добавления поля `max_attempts`, выполните вручную:

@@ -19,7 +19,7 @@ export default function TestPage() {
   const id = Number(params.id);
   const { user } = useAuth();
   const { role, studentId } = useKidsStore();
-  const canEdit = role === 'teacher' || user?.role === 'admin' || user?.role === 'moderator';
+  const canEdit = role === 'teacher' || user?.roles?.includes('admin') || user?.roles?.includes('moderator');
   const [test, setTest] = useState<Test | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');

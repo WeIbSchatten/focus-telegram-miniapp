@@ -19,7 +19,7 @@ const senseAdminNav = [
 export function SidebarSense() {
   const pathname = usePathname();
   const { user } = useAuth();
-  const isAdminOrModerator = user?.role === 'admin' || user?.role === 'moderator';
+  const isAdminOrModerator = user?.roles?.includes('admin') || user?.roles?.includes('moderator');
 
   return (
     <aside className="w-full shrink-0 space-y-4 md:w-56">

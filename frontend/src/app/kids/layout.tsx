@@ -42,7 +42,7 @@ export default function KidsLayout({
     if (!hasKidsAccess || !user?.id || role) return;
     let cancelled = false;
     // Администратор и модератор имеют полный доступ ко всем функциям платформы (роль учителя в Kids)
-    if (user.role === 'admin' || user.role === 'moderator') {
+    if (user.roles?.includes('admin') || user.roles?.includes('moderator')) {
       setKidsRole('teacher');
       return;
     }
@@ -64,7 +64,7 @@ export default function KidsLayout({
       if (!cancelled) toast(getKidsApiErrorMessage(err));
     });
     return () => { cancelled = true; };
-  }, [hasKidsAccess, user?.id, user?.role, role, setKidsRole, toast]);
+  }, [hasKidsAccess, user?.id, user?.roles, role, setKidsRole, toast]);
 
   if (!ready) return <Loader className="min-h-[60vh]" />;
   if (!isAuthenticated) return null;

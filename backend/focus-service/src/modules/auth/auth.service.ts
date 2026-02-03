@@ -12,6 +12,7 @@ import {
   parseTelegramUserFromInitData,
   validateTelegramWidgetData,
 } from '../../shared/utils/telegram.util';
+import { getPrimaryRole } from '../../shared/constants/roles.constant';
 
 @Injectable()
 export class AuthService {
@@ -61,7 +62,7 @@ export class AuthService {
         'Telegram не привязан. Зарегистрируйтесь и привяжите Telegram в личном кабинете.',
       );
     }
-    const payload = { sub: user.id, role: user.role };
+    const payload = { sub: user.id, role: getPrimaryRole(user.roles) };
     const accessToken = await this.jwtService.signAsync(payload, {
       secret: this.jwtCfg.secret,
       expiresIn: this.jwtCfg.expiresIn,
@@ -86,7 +87,7 @@ export class AuthService {
     if (!user) {
       throw new UnauthorizedException('Telegram не привязан. Зарегистрируйтесь и привяжите Telegram в профиле.');
     }
-    const payload = { sub: user.id, role: user.role };
+    const payload = { sub: user.id, role: getPrimaryRole(user.roles) };
     const accessToken = await this.jwtService.signAsync(payload, {
       secret: this.jwtCfg.secret,
       expiresIn: this.jwtCfg.expiresIn,
@@ -105,7 +106,7 @@ export class AuthService {
       throw new UnauthorizedException('Неверный email или пароль');
     }
 
-    const payload = { sub: user.id, role: user.role };
+    const payload = { sub: user.id, role: getPrimaryRole(user.roles) };
     const accessToken = await this.jwtService.signAsync(payload, {
       secret: this.jwtCfg.secret,
       expiresIn: this.jwtCfg.expiresIn,

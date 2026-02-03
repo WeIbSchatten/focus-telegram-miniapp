@@ -37,7 +37,7 @@ export default function AdminGroupEditPage() {
   const [teacherId, setTeacherId] = useState<number | ''>('');
 
   useEffect(() => {
-    if (user?.role !== 'admin' && user?.role !== 'moderator') {
+    if (!user?.roles?.includes('admin') && !user?.roles?.includes('moderator')) {
       router.push(ROUTES.kids.root);
       return;
     }
@@ -65,7 +65,7 @@ export default function AdminGroupEditPage() {
       if (!cancelled) setLoading(false);
     });
     return () => { cancelled = true; };
-  }, [groupId, user?.role, router, toast]);
+  }, [groupId, user?.roles, router, toast]);
 
   const handleSaveData = async (e: React.FormEvent) => {
     e.preventDefault();

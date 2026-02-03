@@ -27,6 +27,7 @@ export class UsersService {
       email: createUserDto.email,
       passwordHash,
       fullName: createUserDto.fullName,
+      roles: [UserRole.USER],
       status: UserStatus.APPROVED,
     });
 
@@ -125,9 +126,9 @@ export class UsersService {
     return this.usersRepository.save(user);
   }
 
-  async setRole(id: string, role: UserRole): Promise<User> {
+  async setRoles(id: string, roles: string[]): Promise<User> {
     const user = await this.findById(id);
-    user.role = role;
+    user.roles = roles?.length ? roles : [UserRole.USER];
     return this.usersRepository.save(user);
   }
 
@@ -177,7 +178,7 @@ export class UsersService {
         email: dto.email,
         passwordHash,
         fullName: dto.fullName,
-        role: dto.role,
+        roles: [dto.role],
         status: UserStatus.APPROVED,
         hasKidsAccess: true,
         hasSenseAccess: true,

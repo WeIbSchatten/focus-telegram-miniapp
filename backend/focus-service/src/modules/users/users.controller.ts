@@ -5,8 +5,8 @@ import { JwtAuthGuard } from '../../common/guards/auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
-import { UserRole } from '../../shared/constants/roles.constant';
-import { SetRoleDto } from './dto/set-role.dto';
+import { UserRole, hasRole } from '../../shared/constants/roles.constant';
+import { SetRolesDto } from './dto/set-roles.dto';
 
 @Controller('users')
 export class UsersController {
@@ -17,16 +17,16 @@ export class UsersController {
   @Roles(UserRole.ADMIN, UserRole.MODERATOR)
   async list(
     @CurrentUser() currentUser: { userId: string; role: string },
-  ): Promise<Pick<User, 'id' | 'email' | 'fullName' | 'role' | 'status' | 'hasKidsAccess' | 'hasSenseAccess' | 'createdAt'>[]> {
+  ): Promise<Pick<User, 'id' | 'email' | 'fullName' | 'roles' | 'status' | 'hasKidsAccess' | 'hasSenseAccess' | 'createdAt'>[]> {
     const users = await this.usersService.findAll();
     return users.map((u) => {
-      const effectiveKidsAccess = u.hasKidsAccess || u.role === UserRole.ADMIN || u.role === UserRole.MODERATOR;
-      const effectiveSenseAccess = u.hasSenseAccess || u.role === UserRole.ADMIN || u.role === UserRole.MODERATOR;
+      const effectiveKidsAccess = u.hasKidsAccess || hasRole(u.roles, UserRole.ADMIN) || hasRole(u.roles, UserRole.MODERATOR);
+      const effectiveSenseAccess = u.hasSenseAccess || hasRole(u.roles, UserRole.ADMIN) || hasRole(u.roles, UserRole.MODERATOR);
       return {
         id: u.id,
         email: u.email,
         fullName: u.fullName,
-        role: u.role,
+        roles: u.roles,
         status: u.status,
         hasKidsAccess: effectiveKidsAccess,
         hasSenseAccess: effectiveSenseAccess,
@@ -40,27 +40,26 @@ export class UsersController {
   async getById(
     @Param('id') id: string,
     @CurrentUser() currentUser: { userId: string; role: string },
-  ): Promise<Pick<User, 'id' | 'email' | 'fullName' | 'role' | 'status' | 'hasKidsAccess' | 'hasSenseAccess'>> {
-    // Пользователь может получить только свою информацию, админы и модераторы - любую
+  ): Promise<Pick<User, 'id' | 'email' | 'fullName' | 'roles' | 'status' | 'hasKidsAccess' | 'hasSenseAccess'>> {
     if (currentUser.userId !== id && currentUser.role !== UserRole.ADMIN && currentUser.role !== UserRole.MODERATOR) {
       throw new ForbiddenException('Доступ только к своим данным');
     }
     const user = await this.usersService.findById(id);
-    const { id: userId, email, fullName, role, status, hasKidsAccess, hasSenseAccess } = user;
-    const effectiveKidsAccess = hasKidsAccess || role === UserRole.ADMIN || role === UserRole.MODERATOR;
-    const effectiveSenseAccess = hasSenseAccess || role === UserRole.ADMIN || role === UserRole.MODERATOR;
-    return { id: userId, email, fullName, role, status, hasKidsAccess: effectiveKidsAccess, hasSenseAccess: effectiveSenseAccess };
+    const { id: userId, email, fullName, roles, status, hasKidsAccess, hasSenseAccess } = user;
+    const effectiveKidsAccess = hasKidsAccess || hasRole(roles, UserRole.ADMIN) || hasRole(roles, UserRole.MODERATOR);
+    const effectiveSenseAccess = hasSenseAccess || hasRole(roles, UserRole.ADMIN) || hasRole(roles, UserRole.MODERATOR);
+    return { id: userId, email, fullName, roles, status, hasKidsAccess: effectiveKidsAccess, hasSenseAccess: effectiveSenseAccess };
   }
 
-  @Patch(':id/role')
+  @Patch(':id/roles')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
-  async setRole(
+  async setRoles(
     @Param('id') id: string,
-    @Body() body: SetRoleDto,
-  ): Promise<Pick<User, 'id' | 'role'>> {
-    const user = await this.usersService.setRole(id, body.role);
-    return { id: user.id, role: user.role };
+    @Body() body: SetRolesDto,
+  ): Promise<Pick<User, 'id' | 'roles'>> {
+    const user = await this.usersService.setRoles(id, body.roles);
+    return { id: user.id, roles: user.roles };
   }
 
   @Delete(':id')

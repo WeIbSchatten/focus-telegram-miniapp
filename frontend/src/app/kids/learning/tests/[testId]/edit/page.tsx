@@ -30,7 +30,7 @@ export default function EditTestPage() {
   const [description, setDescription] = useState('');
   const [maxAttempts, setMaxAttempts] = useState<string>('');
 
-  const canEdit = role === 'teacher' || user?.role === 'admin' || user?.role === 'moderator';
+  const canEdit = role === 'teacher' || user?.roles?.includes('admin') || user?.roles?.includes('moderator');
 
   useEffect(() => {
     if (!testId || Number.isNaN(testId)) {

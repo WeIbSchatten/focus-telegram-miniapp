@@ -40,7 +40,7 @@ export default function ProgramVideosPage() {
   const [videoUrl, setVideoUrl] = useState('');
   const [saving, setSaving] = useState(false);
 
-  const canEdit = role === 'teacher' || user?.role === 'admin' || user?.role === 'moderator';
+  const canEdit = role === 'teacher' || user?.roles?.includes('admin') || user?.roles?.includes('moderator');
 
   useEffect(() => {
     if (!programId || Number.isNaN(programId)) {

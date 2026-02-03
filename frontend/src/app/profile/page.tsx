@@ -140,13 +140,6 @@ export default function ProfilePage() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-8 px-4 py-8">
-      <button
-        type="button"
-        onClick={() => router.back()}
-        className="text-sm font-medium text-primary hover:underline"
-      >
-        ← Назад
-      </button>
       <PageHeader
         title="Личный кабинет"
         description={
@@ -154,15 +147,17 @@ export default function ProfilePage() {
             <p className="text-gray-700">{user?.fullName}</p>
             <p className="text-sm text-gray-600">
               Роль:{' '}
-              {user?.role === 'admin'
+              {user?.roles?.includes('admin')
                 ? 'Администратор'
-                : user?.role === 'moderator'
+                : user?.roles?.includes('moderator')
                   ? 'Модератор'
                   : role === 'student'
                     ? 'Ученик'
                     : role === 'teacher'
                       ? 'Учитель'
-                      : '—'}
+                      : (user?.roles ?? []).length
+                        ? (user.roles as string[]).map((r) => ({ admin: 'Администратор', moderator: 'Модератор', teacher: 'Учитель', student: 'Ученик', user: 'Пользователь' }[r] ?? r)).join(', ')
+                        : '—'}
             </p>
           </>
         }
@@ -333,6 +328,16 @@ export default function ProfilePage() {
           </p>
         </Card>
       )}
+
+      <div className="pt-4">
+        <button
+          type="button"
+          onClick={() => router.back()}
+          className="text-sm font-medium text-primary hover:underline"
+        >
+          ← Назад
+        </button>
+      </div>
     </div>
   );
 }

@@ -15,12 +15,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       router.replace(ROUTES.auth.login);
       return;
     }
-    if (user?.role !== 'admin' && user?.role !== 'moderator') {
+    if (!user?.roles?.includes('admin') && !user?.roles?.includes('moderator')) {
       router.replace(ROUTES.home);
     }
-  }, [accessToken, isAuthenticated, user?.role, router]);
+  }, [accessToken, isAuthenticated, user?.roles, router]);
 
   if (accessToken === null) return null;
-  if (user?.role !== 'admin' && user?.role !== 'moderator') return null;
+  if (!user?.roles?.includes('admin') && !user?.roles?.includes('moderator')) return null;
   return <>{children}</>;
 }

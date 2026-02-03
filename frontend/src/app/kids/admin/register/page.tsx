@@ -24,7 +24,7 @@ export default function AdminRegisterPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  if (user?.role !== 'admin' && user?.role !== 'moderator') {
+  if (!user?.roles?.includes('admin') && !user?.roles?.includes('moderator')) {
     router.push(ROUTES.home);
     return null;
   }

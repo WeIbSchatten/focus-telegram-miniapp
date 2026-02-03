@@ -5,7 +5,7 @@ import type { FocusUser } from '@/types/user';
 
 interface AuthState {
   accessToken: string | null;
-  user: Pick<FocusUser, 'id' | 'email' | 'fullName' | 'role' | 'status' | 'hasKidsAccess' | 'hasSenseAccess' | 'telegramUserId'> | null;
+  user: Pick<FocusUser, 'id' | 'email' | 'fullName' | 'roles' | 'status' | 'hasKidsAccess' | 'hasSenseAccess' | 'telegramUserId'> | null;
   setAuth: (token: string, user: AuthState['user']) => void;
   setUser: (user: AuthState['user']) => void;
   logout: () => void;

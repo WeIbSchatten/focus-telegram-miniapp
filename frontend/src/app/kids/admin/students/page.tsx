@@ -30,7 +30,7 @@ export default function AdminStudentsPage() {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    if (user?.role !== 'admin' && user?.role !== 'moderator') {
+    if (!user?.roles?.includes('admin') && !user?.roles?.includes('moderator')) {
       router.push(ROUTES.kids.root);
       return;
     }
@@ -49,7 +49,7 @@ export default function AdminStudentsPage() {
       if (!cancelled) setLoading(false);
     });
     return () => { cancelled = true; };
-  }, [user?.role, router, toast]);
+  }, [user?.roles, router, toast]);
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();

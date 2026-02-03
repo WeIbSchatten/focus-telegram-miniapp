@@ -22,7 +22,7 @@ export default function AdminLicensePage() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    if (user?.role !== 'admin' && user?.role !== 'moderator') {
+    if (!user?.roles?.includes('admin') && !user?.roles?.includes('moderator')) {
       router.push(ROUTES.kids.root);
       return;
     }
@@ -39,7 +39,7 @@ export default function AdminLicensePage() {
     return () => {
       cancelled = true;
     };
-  }, [user?.role, router, toast]);
+  }, [user?.roles, router, toast]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

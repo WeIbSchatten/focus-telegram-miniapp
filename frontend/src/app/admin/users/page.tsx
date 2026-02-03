@@ -12,9 +12,12 @@ import { Loader } from '@/components/common/Loader';
 import { PageHeader, PAGE_ACTION_BUTTON_CLASS } from '@/components/layout/PageHeader';
 import { useToast } from '@/hooks/useToast';
 import { ROUTES } from '@/lib/constants';
-import type { FocusUser } from '@/types/user';
+import type { FocusUser, UserRole } from '@/types/user';
+import { hasRole } from '@/types/user';
 
 type UserRow = FocusUser & { createdAt?: string };
+
+const ROLE_OPTIONS: UserRole[] = ['admin', 'moderator', 'teacher', 'student', 'user'];
 
 const ROLE_LABELS: Record<string, string> = {
   admin: 'Администратор',
@@ -31,7 +34,7 @@ export default function PlatformAdminUsersPage() {
   const [users, setUsers] = useState<UserRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState<string | null>(null);
-  const isAdmin = user?.role === 'admin';
+  const isAdmin = hasRole(user, 'admin');
 
   const loadUsers = useCallback(() => {
     setLoading(true);
@@ -43,7 +46,7 @@ export default function PlatformAdminUsersPage() {
   }, [toast]);
 
   useEffect(() => {
-    if (user?.role !== 'admin' && user?.role !== 'moderator') {
+    if (!hasRole(user, 'admin') && !hasRole(user, 'moderator')) {
       router.push(ROUTES.home);
       return;
     }
@@ -60,7 +63,7 @@ export default function PlatformAdminUsersPage() {
     return () => {
       cancelled = true;
     };
-  }, [user?.role, router, toast]);
+  }, [user?.roles, router, toast]);
 
   const handleKidsAccess = async (userId: string, hasAccess: boolean) => {
     setUpdating(userId);
@@ -77,14 +80,19 @@ export default function PlatformAdminUsersPage() {
     }
   };
 
-  const handleSetRole = async (userId: string, role: string) => {
+  const handleToggleRole = async (userId: string, role: UserRole, checked: boolean) => {
     if (!isAdmin) return;
     const targetUser = users.find((u) => u.id === userId);
     if (!targetUser) return;
+    const currentRoles = targetUser.roles ?? [];
+    const newRoles = checked
+      ? [...new Set([...currentRoles, role])]
+      : currentRoles.filter((r) => r !== role);
+    const rolesToSave = newRoles.length ? newRoles : ['user'];
     setUpdating(userId);
     try {
-      await focusClient.users.setRole(userId, role);
-      if (role === 'teacher') {
+      await focusClient.users.setRoles(userId, rolesToSave);
+      if (role === 'teacher' && checked) {
         try {
           const teachers = await kidsClient.teachers.list();
           if (!teachers.some((t) => t.focus_user_id === userId)) {
@@ -94,10 +102,10 @@ export default function PlatformAdminUsersPage() {
             });
           }
         } catch {
-          // уже есть или нет доступа к Kids — роль в Focus обновлена
+          // уже есть или нет доступа к Kids
         }
       }
-      if (role === 'student') {
+      if (role === 'student' && checked) {
         try {
           const students = await kidsClient.students.list();
           if (!students.some((s) => s.focus_user_id === userId)) {
@@ -108,13 +116,13 @@ export default function PlatformAdminUsersPage() {
             });
           }
         } catch {
-          // уже есть или нет доступа к Kids — роль в Focus обновлена
+          // уже есть или нет доступа к Kids
         }
       }
       await loadUsers();
-      toast('Роль обновлена');
+      toast('Роли обновлены');
     } catch {
-      toast('Ошибка изменения роли');
+      toast('Ошибка изменения ролей');
     } finally {
       setUpdating(null);
     }
@@ -158,13 +166,6 @@ export default function PlatformAdminUsersPage() {
 
   return (
     <div className="mx-auto max-w-6xl space-y-6 px-4 py-8">
-      <button
-        type="button"
-        onClick={() => router.back()}
-        className="text-sm font-medium text-primary hover:underline"
-      >
-        ← Назад
-      </button>
       <PageHeader
         title="Управление пользователями"
         actions={
@@ -181,10 +182,9 @@ export default function PlatformAdminUsersPage() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-primary/20 text-left text-gray-700">
-                <th className="py-2 pr-4">ID</th>
                 <th className="py-2 pr-4">Email</th>
                 <th className="py-2 pr-4">ФИО</th>
-                <th className="py-2 pr-4">Роль</th>
+                <th className="py-2 pr-4">Роли</th>
                 <th className="py-2 pr-4">Focus Kids</th>
                 <th className="py-2">Действия</th>
               </tr>
@@ -192,25 +192,28 @@ export default function PlatformAdminUsersPage() {
             <tbody>
               {users.map((u) => (
                 <tr key={u.id} className="border-b border-gray-100 text-gray-800">
-                  <td className="py-2 pr-4 font-mono text-xs text-gray-500">{u.id}</td>
                   <td className="py-2 pr-4">{u.email}</td>
                   <td className="py-2 pr-4">{u.fullName}</td>
                   <td className="py-2 pr-4">
                     {isAdmin ? (
-                      <select
-                        value={u.role}
-                        onChange={(e) => handleSetRole(u.id, e.target.value)}
-                        disabled={updating === u.id}
-                        className="rounded border border-primary/30 px-2 py-1 text-gray-800"
-                      >
-                        {Object.entries(ROLE_LABELS).map(([value, label]) => (
-                          <option key={value} value={value}>
-                            {label}
-                          </option>
+                      <div className="flex flex-wrap gap-x-3 gap-y-1">
+                        {ROLE_OPTIONS.map((r) => (
+                          <label key={r} className="flex items-center gap-1.5 text-gray-800">
+                            <input
+                              type="checkbox"
+                              checked={(u.roles ?? []).includes(r)}
+                              onChange={(e) => handleToggleRole(u.id, r, e.target.checked)}
+                              disabled={updating === u.id}
+                              className="rounded border-primary/40"
+                            />
+                            <span className="text-xs">{ROLE_LABELS[r]}</span>
+                          </label>
                         ))}
-                      </select>
+                      </div>
                     ) : (
-                      ROLE_LABELS[u.role] ?? u.role
+                      (u.roles ?? [])
+                        .map((r) => ROLE_LABELS[r] ?? r)
+                        .join(', ') || ROLE_LABELS.user
                     )}
                   </td>
                   <td className="py-2 pr-4">{u.hasKidsAccess ? 'Да' : 'Нет'}</td>
@@ -222,8 +225,8 @@ export default function PlatformAdminUsersPage() {
                         onClick={() => handleKidsAccess(u.id, !u.hasKidsAccess)}
                         disabled={
                           updating === u.id ||
-                          u.role === 'admin' ||
-                          u.role === 'moderator'
+                          (u.roles ?? []).includes('admin') ||
+                          (u.roles ?? []).includes('moderator')
                         }
                       >
                         {u.hasKidsAccess ? 'Забрать Kids' : 'Выдать Kids'}
@@ -249,6 +252,16 @@ export default function PlatformAdminUsersPage() {
           </table>
         </div>
       </Card>
+
+      <div className="pt-4">
+        <button
+          type="button"
+          onClick={() => router.back()}
+          className="text-sm font-medium text-primary hover:underline"
+        >
+          ← Назад
+        </button>
+      </div>
     </div>
   );
 }

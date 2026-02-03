@@ -32,7 +32,7 @@ export default function LearningPage() {
   const { user } = useAuth();
   const { role, studentId } = useKidsStore();
   const [programs, setPrograms] = useState<(Program | ProgramWithCounts)[]>([]);
-  const canEdit = role === 'teacher' || user?.role === 'admin' || user?.role === 'moderator';
+  const canEdit = role === 'teacher' || user?.roles?.includes('admin') || user?.roles?.includes('moderator');
   const [groups, setGroups] = useState<Group[]>([]);
   const [loading, setLoading] = useState(true);
 

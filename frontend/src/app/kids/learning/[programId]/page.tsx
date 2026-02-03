@@ -44,7 +44,7 @@ export default function ProgramPage() {
   const lectures = program.lectures ?? [];
   const homeworks = program.homeworks ?? [];
   const tests = program.tests ?? [];
-  const canEditVideos = role === 'teacher' || user?.role === 'admin' || user?.role === 'moderator';
+  const canEditVideos = role === 'teacher' || user?.roles?.includes('admin') || user?.roles?.includes('moderator');
 
   return (
     <div className="space-y-8">

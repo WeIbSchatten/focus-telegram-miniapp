@@ -14,7 +14,7 @@ import { validateTelegramWebAppData, parseTelegramUserFromInitData } from '../..
 import { ConfigType } from '@nestjs/config';
 import { appConfig } from '../../config/app.config';
 import { Inject } from '@nestjs/common';
-import { UserRole } from '../../shared/constants/roles.constant';
+import { UserRole, hasRole } from '../../shared/constants/roles.constant';
 
 @Controller('auth')
 export class AuthController {
@@ -26,13 +26,13 @@ export class AuthController {
   ) {}
 
   @Post('register')
-  async register(@Body() dto: CreateUserDto): Promise<{ id: string; email: string; fullName: string; role: string; status: string }> {
+  async register(@Body() dto: CreateUserDto): Promise<{ id: string; email: string; fullName: string; roles: string[]; status: string }> {
     const user = await this.usersService.create(dto);
     return {
       id: user.id,
       email: user.email,
       fullName: user.fullName,
-      role: user.role,
+      roles: user.roles,
       status: user.status,
     };
   }
@@ -69,12 +69,12 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   async unlinkTelegram(
     @CurrentUser() currentUser: { userId: string },
-  ): Promise<Pick<User, 'id' | 'email' | 'fullName' | 'role' | 'status' | 'hasKidsAccess' | 'hasSenseAccess' | 'telegramUserId'>> {
+  ): Promise<Pick<User, 'id' | 'email' | 'fullName' | 'roles' | 'status' | 'hasKidsAccess' | 'hasSenseAccess' | 'telegramUserId'>> {
     const updated = await this.usersService.unlinkTelegram(currentUser.userId);
-    const { id, email, fullName, role, status, hasKidsAccess, hasSenseAccess, telegramUserId } = updated;
-    const effectiveKidsAccess = hasKidsAccess || role === UserRole.ADMIN || role === UserRole.MODERATOR;
-    const effectiveSenseAccess = hasSenseAccess || role === UserRole.ADMIN || role === UserRole.MODERATOR;
-    return { id, email, fullName, role, status, hasKidsAccess: effectiveKidsAccess, hasSenseAccess: effectiveSenseAccess, telegramUserId: telegramUserId ?? null };
+    const { id, email, fullName, roles, status, hasKidsAccess, hasSenseAccess, telegramUserId } = updated;
+    const effectiveKidsAccess = hasKidsAccess || hasRole(roles, UserRole.ADMIN) || hasRole(roles, UserRole.MODERATOR);
+    const effectiveSenseAccess = hasSenseAccess || hasRole(roles, UserRole.ADMIN) || hasRole(roles, UserRole.MODERATOR);
+    return { id, email, fullName, roles, status, hasKidsAccess: effectiveKidsAccess, hasSenseAccess: effectiveSenseAccess, telegramUserId: telegramUserId ?? null };
   }
 
   /** Привязать Telegram к текущему аккаунту (требует JWT). */
@@ -103,12 +103,12 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   async me(
     @CurrentUser() user: { userId: string },
-  ): Promise<Pick<User, 'id' | 'email' | 'fullName' | 'role' | 'status' | 'hasKidsAccess' | 'hasSenseAccess' | 'telegramUserId'>> {
+  ): Promise<Pick<User, 'id' | 'email' | 'fullName' | 'roles' | 'status' | 'hasKidsAccess' | 'hasSenseAccess' | 'telegramUserId'>> {
     const fullUser = await this.usersService.findById(user.userId);
-    const { id, email, fullName, role, status, hasKidsAccess, hasSenseAccess, telegramUserId } = fullUser;
-    const effectiveKidsAccess = hasKidsAccess || role === UserRole.ADMIN || role === UserRole.MODERATOR;
-    const effectiveSenseAccess = hasSenseAccess || role === UserRole.ADMIN || role === UserRole.MODERATOR;
-    return { id, email, fullName, role, status, hasKidsAccess: effectiveKidsAccess, hasSenseAccess: effectiveSenseAccess, telegramUserId: telegramUserId ?? null };
+    const { id, email, fullName, roles, status, hasKidsAccess, hasSenseAccess, telegramUserId } = fullUser;
+    const effectiveKidsAccess = hasKidsAccess || hasRole(roles, UserRole.ADMIN) || hasRole(roles, UserRole.MODERATOR);
+    const effectiveSenseAccess = hasSenseAccess || hasRole(roles, UserRole.ADMIN) || hasRole(roles, UserRole.MODERATOR);
+    return { id, email, fullName, roles, status, hasKidsAccess: effectiveKidsAccess, hasSenseAccess: effectiveSenseAccess, telegramUserId: telegramUserId ?? null };
   }
 
   @Patch('me')
@@ -116,12 +116,12 @@ export class AuthController {
   async updateProfile(
     @CurrentUser() user: { userId: string },
     @Body() dto: UpdateProfileDto,
-  ): Promise<Pick<User, 'id' | 'email' | 'fullName' | 'role' | 'status' | 'hasKidsAccess' | 'hasSenseAccess' | 'telegramUserId'>> {
+  ): Promise<Pick<User, 'id' | 'email' | 'fullName' | 'roles' | 'status' | 'hasKidsAccess' | 'hasSenseAccess' | 'telegramUserId'>> {
     const updated = await this.usersService.updateProfile(user.userId, dto);
-    const { id, email, fullName, role, status, hasKidsAccess, hasSenseAccess, telegramUserId } = updated;
-    const effectiveKidsAccess = hasKidsAccess || role === UserRole.ADMIN || role === UserRole.MODERATOR;
-    const effectiveSenseAccess = hasSenseAccess || role === UserRole.ADMIN || role === UserRole.MODERATOR;
-    return { id, email, fullName, role, status, hasKidsAccess: effectiveKidsAccess, hasSenseAccess: effectiveSenseAccess, telegramUserId: telegramUserId ?? null };
+    const { id, email, fullName, roles, status, hasKidsAccess, hasSenseAccess, telegramUserId } = updated;
+    const effectiveKidsAccess = hasKidsAccess || hasRole(roles, UserRole.ADMIN) || hasRole(roles, UserRole.MODERATOR);
+    const effectiveSenseAccess = hasSenseAccess || hasRole(roles, UserRole.ADMIN) || hasRole(roles, UserRole.MODERATOR);
+    return { id, email, fullName, roles, status, hasKidsAccess: effectiveKidsAccess, hasSenseAccess: effectiveSenseAccess, telegramUserId: telegramUserId ?? null };
   }
 
   @Patch('me/password')

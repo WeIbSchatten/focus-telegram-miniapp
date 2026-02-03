@@ -5,7 +5,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { UserRole, UserStatus } from '../../../shared/constants/roles.constant';
+import { UserStatus } from '../../../shared/constants/roles.constant';
 
 @Entity({ name: 'users' })
 export class User {
@@ -24,8 +24,9 @@ export class User {
   @Column({ type: 'varchar', length: 100 })
   fullName!: string;
 
-  @Column({ type: 'enum', enum: UserRole, default: UserRole.USER })
-  role!: UserRole;
+  /** Роли через запятую (TypeORM simple-array). Значения: admin, moderator, teacher, student, user. */
+  @Column({ type: 'simple-array', default: 'user' })
+  roles!: string[];
 
   @Column({ type: 'enum', enum: UserStatus, default: UserStatus.PENDING })
   status!: UserStatus;
