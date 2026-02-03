@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import type { FocusUser } from '@/types/user';
 
 interface UserState {
-  profile: Pick<FocusUser, 'id' | 'email' | 'fullName' | 'role' | 'status' | 'hasKidsAccess'> | null;
+  profile: Pick<FocusUser, 'id' | 'email' | 'fullName' | 'roles' | 'status' | 'hasKidsAccess'> | null;
   setProfile: (profile: UserState['profile']) => void;
 }
 
