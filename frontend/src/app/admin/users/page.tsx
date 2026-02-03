@@ -193,9 +193,17 @@ export default function PlatformAdminUsersPage() {
   if (loading) return <Loader className="min-h-[40vh]" />;
 
   return (
-    <div className="mx-auto max-w-6xl space-y-6 px-4 py-8">
+    <div className="mx-auto max-w-6xl space-y-6 px-4 py-6 md:px-6">
       <PageHeader
         title="Управление пользователями"
+        description={
+          <Link
+            href={ROUTES.home}
+            className="text-sm font-medium text-primary hover:underline"
+          >
+            ← На главную
+          </Link>
+        }
         actions={
           <Link href={ROUTES.admin.register}>
             <Button variant="outline" className={PAGE_ACTION_BUTTON_CLASS}>
@@ -206,50 +214,73 @@ export default function PlatformAdminUsersPage() {
       />
 
       <Card>
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto rounded-lg">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-primary/20 text-left text-gray-700">
-                <th className="py-2 pr-4">Email</th>
-                <th className="py-2 pr-4">ФИО</th>
-                <th className="py-2 pr-4">Роли</th>
-                <th className="py-2 pr-4">Focus Kids</th>
-                <th className="py-2">Действия</th>
+              <tr className="border-b border-primary/20 bg-primary/5 text-left">
+                <th className="py-3 pl-4 pr-3 font-semibold text-primary">Email</th>
+                <th className="py-3 px-3 font-semibold text-primary">ФИО</th>
+                <th className="py-3 px-3 font-semibold text-primary">Роли</th>
+                <th className="py-3 px-3 font-semibold text-primary">Focus Kids</th>
+                <th className="py-3 pl-3 pr-4 text-right font-semibold text-primary">Действия</th>
               </tr>
             </thead>
             <tbody>
               {users.map((u) => (
-                <tr key={u.id} className="border-b border-gray-100 text-gray-800">
-                  <td className="py-2 pr-4">{u.email}</td>
-                  <td className="py-2 pr-4">{u.fullName}</td>
-                  <td className="py-2 pr-4">
+                <tr
+                  key={u.id}
+                  className="border-b border-gray-100 text-gray-800 transition-colors last:border-0 hover:bg-gray-50/80"
+                >
+                  <td className="py-3 pl-4 pr-3 font-medium">{u.email}</td>
+                  <td className="py-3 px-3">{u.fullName ?? '—'}</td>
+                  <td className="py-3 px-3">
                     {isAdmin ? (
-                      <div className="flex flex-wrap gap-x-3 gap-y-1">
+                      <div className="flex flex-wrap gap-2">
                         {ROLE_OPTIONS.map((r) => (
-                          <label key={r} className="flex items-center gap-1.5 text-gray-800">
+                          <label
+                            key={r}
+                            className="flex cursor-pointer items-center gap-1.5 rounded-md border border-primary/20 bg-white px-2 py-1 text-xs has-[:checked]:border-primary/50 has-[:checked]:bg-primary/10"
+                          >
                             <input
                               type="checkbox"
                               checked={(u.roles ?? []).includes(r)}
                               onChange={(e) => handleToggleRole(u.id, r, e.target.checked)}
                               disabled={updating === u.id}
-                              className="rounded border-primary/40"
+                              className="rounded border-primary/40 text-primary focus:ring-primary/50"
                             />
-                            <span className="text-xs">{ROLE_LABELS[r]}</span>
+                            <span>{ROLE_LABELS[r]}</span>
                           </label>
                         ))}
                       </div>
                     ) : (
-                      (u.roles ?? [])
-                        .map((r) => ROLE_LABELS[r] ?? r)
-                        .join(', ') || ROLE_LABELS.user
+                      <div className="flex flex-wrap gap-1">
+                        {((u.roles ?? []).length ? (u.roles ?? []) : ['user']).map((r) => (
+                          <span
+                            key={r}
+                            className="inline-flex rounded-md bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary"
+                          >
+                            {ROLE_LABELS[r] ?? r}
+                          </span>
+                        ))}
+                      </div>
                     )}
                   </td>
-                  <td className="py-2 pr-4">{u.hasKidsAccess ? 'Да' : 'Нет'}</td>
-                  <td className="py-2">
-                    <div className="flex flex-nowrap items-center gap-2">
+                  <td className="py-3 px-3">
+                    <span
+                      className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                        u.hasKidsAccess
+                          ? 'bg-kids/20 text-kids-dark'
+                          : 'bg-gray-100 text-gray-600'
+                      }`}
+                    >
+                      {u.hasKidsAccess ? 'Доступ' : 'Нет'}
+                    </span>
+                  </td>
+                  <td className="py-3 pl-3 pr-4 text-right">
+                    <div className="flex flex-wrap items-center justify-end gap-2">
                       <Button
                         variant="outline"
-                        className="min-w-[7rem] shrink-0 text-sm"
+                        className="min-w-0 shrink-0 px-3 py-1.5 text-sm"
                         onClick={() => handleKidsAccess(u.id, !u.hasKidsAccess)}
                         disabled={
                           updating === u.id ||
@@ -261,7 +292,7 @@ export default function PlatformAdminUsersPage() {
                       </Button>
                       <Button
                         variant="outline"
-                        className="min-w-[7rem] shrink-0 text-sm text-red-600 hover:bg-red-50"
+                        className="min-w-0 shrink-0 border-red-200 px-3 py-1.5 text-sm text-red-600 hover:bg-red-50"
                         onClick={() => handleDelete(u)}
                         disabled={updating === u.id || u.id === user?.id}
                         title={
@@ -280,16 +311,6 @@ export default function PlatformAdminUsersPage() {
           </table>
         </div>
       </Card>
-
-      <div className="pt-4">
-        <button
-          type="button"
-          onClick={() => router.back()}
-          className="text-sm font-medium text-primary hover:underline"
-        >
-          ← Назад
-        </button>
-      </div>
     </div>
   );
 }
