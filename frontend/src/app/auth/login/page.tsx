@@ -37,7 +37,7 @@ export default function LoginPage() {
     );
     script.async = true;
     telegramWidgetRef.current.appendChild(script);
-  }, [inside]);
+  }, [inside, TELEGRAM_BOT_NAME]);
 
   if (isAuthenticated) {
     router.push(ROUTES.home);
@@ -116,11 +116,18 @@ export default function LoginPage() {
           </div>
         )}
 
-        {!inside && TELEGRAM_BOT_NAME && (
-          <div className="mt-6 flex justify-center" ref={telegramWidgetRef} />
-        )}
-        {!inside && TELEGRAM_BOT_NAME && (
-          <p className="mt-4 text-center text-sm text-gray-600">или</p>
+        {!inside && (
+          <div className="mt-6">
+            <p className="mb-2 text-center text-sm font-medium text-gray-700">Войти через Telegram</p>
+            {TELEGRAM_BOT_NAME ? (
+              <div className="flex min-h-[44px] justify-center" ref={telegramWidgetRef} />
+            ) : (
+              <p className="rounded-lg bg-amber-50 px-3 py-2 text-center text-xs text-amber-800">
+                Для отображения кнопки входа через Telegram укажите <code className="rounded bg-amber-100 px-1">NEXT_PUBLIC_TELEGRAM_BOT_NAME</code> в настройках приложения (имя бота без @).
+              </p>
+            )}
+            <p className="mt-4 text-center text-sm text-gray-600">или</p>
+          </div>
         )}
 
         {needLink && inside && initData && (

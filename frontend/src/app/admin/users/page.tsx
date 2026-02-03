@@ -222,7 +222,7 @@ export default function PlatformAdminUsersPage() {
                 <th className="py-3 px-3 font-semibold text-primary">ФИО</th>
                 <th className="py-3 px-3 font-semibold text-primary">Роли</th>
                 <th className="py-3 px-3 font-semibold text-primary">Focus Kids</th>
-                <th className="py-3 pl-3 pr-4 text-right font-semibold text-primary whitespace-nowrap min-w-[21rem]">Действия</th>
+                <th className="py-3 pl-3 pr-4 text-right font-semibold text-primary whitespace-nowrap">Действия</th>
               </tr>
             </thead>
             <tbody>
@@ -276,11 +276,11 @@ export default function PlatformAdminUsersPage() {
                       {u.hasKidsAccess ? 'Доступ' : 'Нет'}
                     </span>
                   </td>
-                  <td className="py-3 pl-3 pr-4 text-right whitespace-nowrap min-w-[21rem]">
-                    <div className="flex flex-nowrap items-center justify-end gap-2 w-fit ml-auto">
+                  <td className="py-3 pl-3 pr-4 text-right whitespace-nowrap">
+                    <div className="flex flex-col items-end gap-1.5">
                       <Button
                         variant="outline"
-                        className="min-w-[10rem] shrink-0 px-3 py-1.5 text-sm"
+                        className="min-w-0 shrink-0 px-2.5 py-1 text-xs"
                         onClick={() => handleKidsAccess(u.id, !u.hasKidsAccess)}
                         disabled={
                           updating === u.id ||
@@ -292,7 +292,7 @@ export default function PlatformAdminUsersPage() {
                       </Button>
                       <Button
                         variant="outline"
-                        className="min-w-[10rem] shrink-0 border-red-200 px-3 py-1.5 text-sm text-red-600 hover:bg-red-50"
+                        className="min-w-0 shrink-0 border-red-200 px-2.5 py-1 text-xs text-red-600 hover:bg-red-50"
                         onClick={() => handleDelete(u)}
                         disabled={updating === u.id || u.id === user?.id}
                         title={
