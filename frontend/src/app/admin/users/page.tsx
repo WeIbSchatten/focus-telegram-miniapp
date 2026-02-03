@@ -93,7 +93,7 @@ export default function PlatformAdminUsersPage() {
     try {
       const { roles: savedRoles } = await focusClient.users.setRoles(userId, rolesToSave);
       setUsers((prev) =>
-        prev.map((u) => (u.id === userId ? { ...u, roles: savedRoles } : u))
+        prev.map((u) => (u.id === userId ? { ...u, roles: savedRoles as UserRole[] } : u))
       );
 
       if (role === 'teacher' && checked) {
