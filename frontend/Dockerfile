@@ -10,16 +10,20 @@ FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-# Клиенту — пустые = относительные URL (/api-focus, /api-kids). Прокси — на сервисы Docker.
+# Клиенту — пустые = относительные URL (/api-focus, /api-kids, /api-sense). Прокси — на сервисы Docker.
 ARG NEXT_PUBLIC_FOCUS_API_URL=
 ARG NEXT_PUBLIC_KIDS_API_URL=
+ARG NEXT_PUBLIC_SENSE_API_URL=
 ARG REWRITE_FOCUS_URL=http://focus-service:3000
 ARG REWRITE_KIDS_URL=http://focus-kids-service:8000
+ARG REWRITE_SENSE_URL=http://focus-sense-service:8000
 ARG NEXT_PUBLIC_TELEGRAM_BOT_NAME
 ENV NEXT_PUBLIC_FOCUS_API_URL=$NEXT_PUBLIC_FOCUS_API_URL
 ENV NEXT_PUBLIC_KIDS_API_URL=$NEXT_PUBLIC_KIDS_API_URL
+ENV NEXT_PUBLIC_SENSE_API_URL=$NEXT_PUBLIC_SENSE_API_URL
 ENV REWRITE_FOCUS_URL=$REWRITE_FOCUS_URL
 ENV REWRITE_KIDS_URL=$REWRITE_KIDS_URL
+ENV REWRITE_SENSE_URL=$REWRITE_SENSE_URL
 ENV NEXT_PUBLIC_TELEGRAM_BOT_NAME=$NEXT_PUBLIC_TELEGRAM_BOT_NAME
 RUN npm run build
 

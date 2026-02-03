@@ -102,7 +102,7 @@ CORS_ORIGINS_EXTRA=https://focusvn.mooo.com
 - `длинный_случайный_секрет_...` — случайные строки (например, `openssl rand -hex 32`).
 - Для домена **focusvn.mooo.com** оставьте `CORS_ORIGINS_EXTRA=https://focusvn.mooo.com`.
 
-**Быстрое создание всех файлов:** в репозитории есть скрипт `docs/create-env-files.sh`, в котором уже подставлены три ключа (пароль БД, INTERNAL_API_SECRET, TELEGRAM_BOT_NOTIFY_SECRET). На сервере после клонирования выполните:
+**Быстрое создание всех файлов:** в репозитории есть скрипт `docs/create-env-files.sh`, который создаёт `.env` для корня, focus-service, focus-kids-service, **focus-sense-service**, telegram-bot и `frontend/.env.local`. На сервере после клонирования выполните:
 ```bash
 cd /opt/focus-telegram-miniapp
 bash docs/create-env-files.sh
@@ -130,7 +130,15 @@ TELEGRAM_BOT_NOTIFY_SECRET=тот_же_что_TELEGRAM_BOT_NOTIFY_SECRET_в_ко
 CORS_ORIGINS_EXTRA=https://focusvn.mooo.com
 ```
 
-**5.4. backend/telegram-bot/.env**
+**5.4. backend/focus-sense-service/.env**
+
+```env
+APP_DATABASE_URL=postgresql://focus:СЛОЖНЫЙ_ПАРОЛЬ_БД@focus-db:5432/focus_db
+APP_JWT_SECRET=тот_же_APP_JWT_SECRET_что_в_focus-service
+CORS_ORIGINS_EXTRA=https://focusvn.mooo.com
+```
+
+**5.5. backend/telegram-bot/.env**
 
 ```env
 TELEGRAM_BOT_TOKEN=ТОКЕН_ОТ_BOTFATHER
@@ -141,23 +149,25 @@ INTERNAL_API_SECRET=тот_же_что_в_корневом_.env
 NOTIFY_PORT=4000
 ```
 
-**5.5. frontend/.env.local**
+**5.6. frontend/.env.local**
 
 ```env
 NEXT_PUBLIC_FOCUS_API_URL=
 NEXT_PUBLIC_KIDS_API_URL=
+NEXT_PUBLIC_SENSE_API_URL=
 NEXT_PUBLIC_TELEGRAM_BOT_NAME=имя_вашего_бота_в_telegram
 ```
 
 (Пустые URL — запросы идут через прокси Next.js к контейнерам. Укажите имя бота в Telegram, например `focus_vn_bot`.)
 
-Создать файлы можно так (подставьте свои значения):
+Создать файлы вручную можно так (подставьте свои значения):
 
 ```bash
 cd /opt/focus-telegram-miniapp
-mkdir -p backend/focus-service backend/focus-kids-service backend/telegram-bot frontend
+mkdir -p backend/focus-service backend/focus-kids-service backend/focus-sense-service backend/telegram-bot frontend
 nano backend/focus-service/.env
 nano backend/focus-kids-service/.env
+nano backend/focus-sense-service/.env
 nano backend/telegram-bot/.env
 nano frontend/.env.local
 ```
@@ -177,7 +187,7 @@ docker compose up -d --build
 docker compose ps
 ```
 
-Все сервисы должны быть в состоянии `running`.
+Должны быть в состоянии `running`: focus-db, focus-service, focus-kids-service, **focus-sense-service**, focus-frontend, focus-telegram-bot.
 
 ---
 
@@ -253,7 +263,7 @@ ufw enable
 ufw status
 ```
 
-Порты 3000, 3001, 8001, 4000 снаружи не открывайте — к ним обращается только Nginx и контейнеры между собой.
+Порты 3000, 3001, 8001, 8002, 4000 снаружи не открывайте — к ним обращается только Nginx и контейнеры между собой.
 
 ---
 
@@ -282,7 +292,7 @@ ufw status
 - **По домену (после шагов 7–8):** **https://focusvn.mooo.com**
 - **По IP (до настройки DNS/HTTPS):** `http://85.193.80.145:3000`
 
-Страница Focus (главная, вход, Focus Kids) доступна по **https://focusvn.mooo.com**. Бот ведёт на этот же адрес.
+Страница Focus (главная, вход, Focus Kids, Focus Sense) доступна по **https://focusvn.mooo.com**. Бот ведёт на этот же адрес.
 
 ---
 
@@ -293,6 +303,8 @@ ufw status
 | Логи всех сервисов | `docker compose logs -f` |
 | Логи фронтенда | `docker compose logs -f frontend` |
 | Остановить | `docker compose down` |
-| Перезапустить после изменений | `cd /opt/focus-telegram-miniapp && git pull && docker compose up -d --build` |
+| Перезапустить после изменений (обновление кода) | `cd /opt/focus-telegram-miniapp && git pull && docker compose up -d --build` |
+
+**Важно при обновлении (git pull):** перед `docker compose up -d --build` убедитесь, что есть все нужные `.env` (в т.ч. `backend/focus-sense-service/.env`). Если добавили новый сервис — один раз выполните `bash docs/create-env-files.sh` или создайте недостающий `.env` вручную, затем снова `docker compose up -d --build`.
 
 После выполнения шагов 1–8 и настройки бота (шаг 10) Focus доступен по **https://focusvn.mooo.com**, а из Telegram — по кнопке меню бота.

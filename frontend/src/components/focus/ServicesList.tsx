@@ -11,8 +11,16 @@ const services = [
     href: ROUTES.kids.root,
     cta: 'Перейти в Focus Kids',
     kids: true,
+    sense: false,
   },
-  // Расширяемость: здесь можно добавить сервис личностного роста и др.
+  {
+    title: 'Focus Sense',
+    description: 'Медитация и личностный рост. Аудиомедитации, аффирмации, установка на неделю и вопрос дня.',
+    href: ROUTES.sense.root,
+    cta: 'Перейти в Focus Sense',
+    kids: false,
+    sense: true,
+  },
 ];
 
 export function ServicesList() {
@@ -30,6 +38,7 @@ export function ServicesList() {
             href={s.href}
             cta={s.cta}
             kids={s.kids}
+            sense={s.sense}
           />
         ))}
       </div>

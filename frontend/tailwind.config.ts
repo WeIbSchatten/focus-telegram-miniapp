@@ -20,6 +20,13 @@ const config: Config = {
           /** Текст на жёлтом фоне — чёрный для контраста */
           text: '#1a1a1a',
         },
+        sense: {
+          DEFAULT: '#0D9488',
+          light: '#14B8A6',
+          dark: '#0F766E',
+          /** Текст на teal фоне — белый для контраста */
+          text: '#FFFFFF',
+        },
         background: '#FFFFFF',
       },
       fontFamily: {
@@ -36,6 +43,7 @@ const config: Config = {
       backgroundImage: {
         'gradient-primary': 'linear-gradient(135deg, #7109AA 0%, #A855F7 100%)',
         'gradient-banner': 'linear-gradient(135deg, #7109AA 0%, #A855F7 80%)',
+        'gradient-sense': 'linear-gradient(135deg, #0D9488 0%, #14B8A6 80%)',
       },
     },
   },

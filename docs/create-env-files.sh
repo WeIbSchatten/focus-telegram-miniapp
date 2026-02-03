@@ -17,7 +17,7 @@ APP_JWT_SECRET="$INTERNAL_API_SECRET"
 TELEGRAM_BOT_TOKEN="${TELEGRAM_BOT_TOKEN:-8375618909:AAG8eL4p_NimneWw8vNcNHZGbCpWTMGMtUc}"
 BOT_NAME="${NEXT_PUBLIC_TELEGRAM_BOT_NAME:-focus_vn_bot}"
 
-mkdir -p backend/focus-service backend/focus-kids-service backend/telegram-bot frontend
+mkdir -p backend/focus-service backend/focus-kids-service backend/focus-sense-service backend/telegram-bot frontend
 
 # 1. Корневой .env
 cat > .env << EOF
@@ -53,7 +53,15 @@ CORS_ORIGINS_EXTRA=https://focusvn.mooo.com
 EOF
 echo "Created $ROOT/backend/focus-kids-service/.env"
 
-# 4. backend/telegram-bot/.env
+# 4. backend/focus-sense-service/.env
+cat > backend/focus-sense-service/.env << EOF
+APP_DATABASE_URL=postgresql://focus:$POSTGRES_PASSWORD@focus-db:5432/focus_db
+APP_JWT_SECRET=$APP_JWT_SECRET
+CORS_ORIGINS_EXTRA=https://focusvn.mooo.com
+EOF
+echo "Created $ROOT/backend/focus-sense-service/.env"
+
+# 5. backend/telegram-bot/.env
 cat > backend/telegram-bot/.env << EOF
 TELEGRAM_BOT_TOKEN=$TELEGRAM_BOT_TOKEN
 MINI_APP_URL=https://focusvn.mooo.com
@@ -64,10 +72,11 @@ NOTIFY_PORT=4000
 EOF
 echo "Created $ROOT/backend/telegram-bot/.env"
 
-# 5. frontend/.env.local
+# 6. frontend/.env.local
 cat > frontend/.env.local << EOF
 NEXT_PUBLIC_FOCUS_API_URL=
 NEXT_PUBLIC_KIDS_API_URL=
+NEXT_PUBLIC_SENSE_API_URL=
 NEXT_PUBLIC_TELEGRAM_BOT_NAME=$BOT_NAME
 EOF
 echo "Created $ROOT/frontend/.env.local"

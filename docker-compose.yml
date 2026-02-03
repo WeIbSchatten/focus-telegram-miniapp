@@ -42,14 +42,30 @@ services:
     ports:
       - "8001:8000"
 
+  focus-sense-service:
+    build: ./backend/focus-sense-service
+    container_name: focus-sense-service
+    depends_on:
+      - focus-db
+    env_file:
+      - ./backend/focus-sense-service/.env
+    environment:
+      - CORS_ORIGINS_EXTRA=${CORS_ORIGINS_EXTRA:-https://09e52bf30fd6d5.lhr.life}
+    ports:
+      - "8002:8000"
+    volumes:
+      - sense-uploads:/app/uploads
+
   frontend:
     build:
       context: ./frontend
       args:
         NEXT_PUBLIC_FOCUS_API_URL: ""
         NEXT_PUBLIC_KIDS_API_URL: ""
+        NEXT_PUBLIC_SENSE_API_URL: ""
         REWRITE_FOCUS_URL: http://focus-service:3000
         REWRITE_KIDS_URL: http://focus-kids-service:8000
+        REWRITE_SENSE_URL: http://focus-sense-service:8000
     container_name: focus-frontend
     env_file:
       - ./frontend/.env.local
@@ -57,11 +73,13 @@ services:
       # Прокси: Next.js читает rewrites() при старте — без этого в контейнере fallback localhost и данные не грузятся
       - REWRITE_FOCUS_URL=http://focus-service:3000
       - REWRITE_KIDS_URL=http://focus-kids-service:8000
+      - REWRITE_SENSE_URL=http://focus-sense-service:8000
     ports:
       - "3000:3000"
     depends_on:
       - focus-service
       - focus-kids-service
+      - focus-sense-service
 
   telegram-bot:
     build: ./backend/telegram-bot
@@ -80,4 +98,5 @@ services:
 
 volumes:
   focus-db-data:
+  sense-uploads:
 

@@ -1,6 +1,7 @@
 /** Пустая строка = использовать прокси Next.js (rewrites в next.config.js) */
 export const FOCUS_API_URL = process.env.NEXT_PUBLIC_FOCUS_API_URL || '';
 export const KIDS_API_URL = process.env.NEXT_PUBLIC_KIDS_API_URL || '';
+export const SENSE_API_URL = process.env.NEXT_PUBLIC_SENSE_API_URL || '';
 export const TELEGRAM_BOT_NAME = process.env.NEXT_PUBLIC_TELEGRAM_BOT_NAME || '';
 
 export const ROUTES = {
@@ -10,6 +11,12 @@ export const ROUTES = {
     register: '/auth/register',
   },
   license: '/license',
+  sense: {
+    root: '/sense',
+    meditations: '/sense/meditations',
+    affirmations: '/sense/affirmations',
+    admin: '/sense/admin',
+  },
   kids: {
     root: '/kids',
     profile: '/kids/profile',

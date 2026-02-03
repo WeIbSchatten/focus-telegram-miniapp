@@ -10,15 +10,19 @@ interface ServiceCardProps {
   href: string;
   cta: string;
   kids?: boolean;
+  sense?: boolean;
 }
 
-export function ServiceCard({ title, description, href, cta, kids }: ServiceCardProps) {
+export function ServiceCard({ title, description, href, cta, kids, sense }: ServiceCardProps) {
+  const variant = sense ? 'sense' : kids ? 'kids' : 'default';
+  const buttonVariant = sense ? 'sense' : kids ? 'kids' : 'primary';
+  const titleColor = sense ? 'text-sense' : kids ? 'text-primary' : 'text-primary';
   return (
-    <Card variant={kids ? 'kids' : 'default'} className="flex flex-col">
-      <h3 className="text-heading text-primary">{title}</h3>
+    <Card variant={variant} className="flex flex-col">
+      <h3 className={`text-heading ${titleColor}`}>{title}</h3>
       <p className="mt-2 flex-1 text-gray-700">{description}</p>
-      <Link href={href} className="mt-4 inline-block">
-        <Button variant={kids ? 'kids' : 'primary'}>{cta}</Button>
+      <Link href={href} className="mt-4 inline-block no-underline hover:no-underline">
+        <Button variant={buttonVariant}>{cta}</Button>
       </Link>
     </Card>
   );

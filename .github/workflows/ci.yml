@@ -79,6 +79,26 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+  # --- Focus Sense Service (Python) ---
+  focus-sense-service:
+    name: Focus Sense Service
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: "pip"
+          cache-dependency-path: backend/focus-sense-service/requirements.txt
+
+      - name: Install dependencies
+        run: |
+          cd backend/focus-sense-service
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
   # --- Telegram Bot (Node/TypeScript) ---
   telegram-bot:
     name: Telegram Bot
@@ -103,7 +123,7 @@ jobs:
   docker-build:
     name: Docker build
     runs-on: ubuntu-latest
-    needs: [frontend, focus-service, focus-kids-service, telegram-bot]
+    needs: [frontend, focus-service, focus-kids-service, focus-sense-service, telegram-bot]
     steps:
       - uses: actions/checkout@v4
 
@@ -128,6 +148,15 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      - name: Build Focus Sense Service image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend/focus-sense-service
+          push: false
+          tags: focus-sense-service:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
       - name: Build Telegram Bot image
         uses: docker/build-push-action@v6
         with:
@@ -146,8 +175,10 @@ jobs:
           build-args: |
             NEXT_PUBLIC_FOCUS_API_URL=
             NEXT_PUBLIC_KIDS_API_URL=
+            NEXT_PUBLIC_SENSE_API_URL=
             REWRITE_FOCUS_URL=http://focus-service:3000
             REWRITE_KIDS_URL=http://focus-kids-service:8000
+            REWRITE_SENSE_URL=http://focus-sense-service:8000
             NEXT_PUBLIC_TELEGRAM_BOT_NAME=
           cache-from: type=gha
           cache-to: type=gha,mode=max

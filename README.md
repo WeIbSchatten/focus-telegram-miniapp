@@ -9,7 +9,7 @@
 - **Focus (hub)** – основной сервис‑хаб, через который:
   - пользователи проходят регистрацию;
   - модераторы одобряют заявки и выдают доступ к дочерним сервисам;
-  - в текущем релизе – доступ к сервису **Focus Kids**.
+  - в текущем релизе – доступ к сервисам **Focus Kids** и **Focus Sense**.
 - **Focus Kids** – сервис онлайн‑обучения детей английскому языку:
   - управление учениками, учителями и группами;
   - учёт посещаемости оффлайн‑занятий;
@@ -17,13 +17,19 @@
   - конструктор программы обучения (лекции, ДЗ, тесты);
   - загрузка и проверка домашних заданий;
   - система тестов с авто‑проверкой и возможностью перепрохождения по решению учителя.
+- **Focus Sense** – сервис медитации и личностного роста:
+  - аудиомедитации и аффирмации на ходу (mp3/m4a, до 5 МБ);
+  - установка на неделю (одна случайная установка на главной, обновляется в понедельник в 00:00);
+  - вопрос дня (один случайный вопрос на главной, обновляется каждый день в 00:00);
+  - доступ имеют все зарегистрированные пользователи платформы Focus.
 
 Платформа спроектирована как **SOA** с отдельными сервисами:
 
 - сервис **Focus** (NestJS) – аутентификация, регистрация, модерация, доступ к сервисам;
 - сервис **Focus Kids** (FastAPI) – доменная логика школы английского;
+- сервис **Focus Sense** (FastAPI) – медитации, аффирмации, установка на неделю, вопрос дня;
 - **Telegram Bot** (Node.js, Telegraf) – минимальный бот: кнопка меню и /start для открытия Mini App;
-- **Frontend** (Next.js, Telegram Mini App) – единый интерфейс для Focus и Focus Kids.
+- **Frontend** (Next.js, Telegram Mini App) – единый интерфейс для Focus, Focus Kids и Focus Sense.
 
 Роли в системе:
 
@@ -33,7 +39,7 @@
 - **Student** – просмотр и выполнение заданий, прохождение тестов;
 - **User** – зарегистрированный пользователь, подавший заявку на доступ к сервисам.
 
-Дальнейшее развитие платформы предполагает добавление новых сервисов (например, сервис личностного роста) без изменения ядра Focus.
+Дальнейшее развитие платформы предполагает добавление новых сервисов без изменения ядра Focus.
 
 ## Что нужно изменить для запуска
 
@@ -45,8 +51,9 @@
 | **Корень** `.env` | `INTERNAL_API_SECRET`, `TELEGRAM_BOT_NOTIFY_SECRET` | Произвольные длинные секреты. Тот же `INTERNAL_API_SECRET` — в focus-service и в telegram-bot; тот же `TELEGRAM_BOT_NOTIFY_SECRET` — в focus-kids-service и в telegram-bot как `NOTIFY_SECRET`. |
 | **backend/telegram-bot/.env** | `MINI_APP_URL` | Публичный HTTPS-адрес фронта (туннель или домен). Пример: `https://09e52bf30fd6d5.lhr.life`. При смене туннеля — обновить здесь и в корневом `.env` (`TUNNEL_OR_FRONTEND_URL`, `CORS_ORIGINS_EXTRA`). |
 | **backend/focus-kids-service/.env** | `TELEGRAM_BOT_NOTIFY_URL`, `TELEGRAM_BOT_NOTIFY_SECRET`, `CORS_ORIGINS_EXTRA` | `TELEGRAM_BOT_NOTIFY_URL=http://focus-telegram-bot:4000`. Секрет — тот же, что `NOTIFY_SECRET` в боте. `CORS_ORIGINS_EXTRA` — URL туннеля (HTTPS) для Mini App. |
+| **backend/focus-sense-service/.env** | `APP_JWT_SECRET`, `CORS_ORIGINS_EXTRA` | `APP_JWT_SECRET` — тот же, что в focus-service. `CORS_ORIGINS_EXTRA` — URL туннеля (HTTPS) для Mini App. |
 | **backend/focus-service/.env** | `INTERNAL_API_SECRET` | Тот же, что в telegram-bot (для внутреннего API telegram-ids). |
-| **frontend/.env.local** | `NEXT_PUBLIC_TELEGRAM_BOT_NAME` | Username бота без @ (например `focus_vn_bot`). Оставь `NEXT_PUBLIC_FOCUS_API_URL` и `NEXT_PUBLIC_KIDS_API_URL` пустыми (запросы идут через прокси). |
+| **frontend/.env.local** | `NEXT_PUBLIC_TELEGRAM_BOT_NAME` | Username бота без @ (например `focus_vn_bot`). Оставь `NEXT_PUBLIC_FOCUS_API_URL`, `NEXT_PUBLIC_KIDS_API_URL` и `NEXT_PUBLIC_SENSE_API_URL` пустыми (запросы идут через прокси). |
 
 Остальные переменные из `.env.example` можно оставить по умолчанию.
 
@@ -59,7 +66,8 @@
    - В **backend/focus-service**: создай `.env` с `APP_DATABASE_URL=postgres://focus:focus_password@focus-db:5432/focus_db`, `APP_JWT_SECRET=change_me_focus_jwt`, `TELEGRAM_BOT_TOKEN=<токен>`, `INTERNAL_API_SECRET` (тот же, что в корне).
    - В **backend/focus-kids-service**: создай `.env` с `APP_DATABASE_URL`, `APP_JWT_SECRET`, `FOCUS_SERVICE_URL=http://focus-service:3000`, `TELEGRAM_BOT_NOTIFY_URL=http://focus-telegram-bot:4000`, `TELEGRAM_BOT_NOTIFY_SECRET`, `CORS_ORIGINS_EXTRA` (URL туннеля, см. ниже).
    - В **backend/telegram-bot**: `cp .env.example .env`, укажи `TELEGRAM_BOT_TOKEN`, `MINI_APP_URL` (URL туннеля после его запуска), `NOTIFY_SECRET`, `FOCUS_SERVICE_URL=http://focus-service:3000`, `INTERNAL_API_SECRET`.
-   - В **frontend**: `cp .env.local.example .env.local`. Оставь `NEXT_PUBLIC_FOCUS_API_URL=` и `NEXT_PUBLIC_KIDS_API_URL=` пустыми. Укажи `NEXT_PUBLIC_TELEGRAM_BOT_NAME`.
+   - В **backend/focus-sense-service**: создай `.env` с `APP_DATABASE_URL=postgres://focus:focus_password@focus-db:5432/focus_db`, `APP_JWT_SECRET` (тот же, что в focus-service), `CORS_ORIGINS_EXTRA` (URL туннеля при Mini App).
+   - В **frontend**: `cp .env.local.example .env.local`. Оставь `NEXT_PUBLIC_FOCUS_API_URL=`, `NEXT_PUBLIC_KIDS_API_URL=` и `NEXT_PUBLIC_SENSE_API_URL=` пустыми. Укажи `NEXT_PUBLIC_TELEGRAM_BOT_NAME`.
 
 2. **Запусти стек:**
    ```bash
@@ -70,12 +78,12 @@
    ```bash
    docker-compose ps
    ```
-   Должны быть: focus-db, focus-service, focus-kids-service, focus-frontend, focus-telegram-bot.
+   Должны быть: focus-db, focus-service, focus-kids-service, focus-sense-service, focus-frontend, focus-telegram-bot.
 
 4. **Сайт в браузере:**
    - Главная: [http://localhost:3000](http://localhost:3000)
    - Регистрация: [http://localhost:3000/auth/register](http://localhost:3000/auth/register)
-   - После входа — Focus Kids: [http://localhost:3000/kids](http://localhost:3000/kids)
+   - После входа — Focus Kids: [http://localhost:3000/kids](http://localhost:3000/kids), Focus Sense: [http://localhost:3000/sense](http://localhost:3000/sense)
 
 5. **Mini App в Telegram** — нужен публичный HTTPS-адрес фронта. Разверни туннель (см. [Туннель для Mini App](#туннель-для-mini-app)), подставь полученный URL в `MINI_APP_URL` (бот) и в `CORS_ORIGINS_EXTRA` (focus-kids-service), перезапусти контейнеры (`docker-compose up -d`). Затем открой бота в Telegram и нажми «Открыть Focus».
 
@@ -98,6 +106,7 @@
 4. Подставь этот URL в конфигурацию:
    - **backend/telegram-bot/.env**: `MINI_APP_URL=https://xxxxxx.lhr.life`
    - **backend/focus-kids-service/.env**: `CORS_ORIGINS_EXTRA=https://xxxxxx.lhr.life`
+   - **backend/focus-sense-service/.env**: `CORS_ORIGINS_EXTRA=https://xxxxxx.lhr.life`
    - В корневом **.env** (если используешь): `TUNNEL_OR_FRONTEND_URL=https://xxxxxx.lhr.life`, `CORS_ORIGINS_EXTRA=https://xxxxxx.lhr.life`
 5. Перезапусти сервисы, чтобы подхватить новые переменные:
    ```bash
@@ -115,7 +124,8 @@
 
 - В **Docker** поднимается один PostgreSQL (`focus-db`). База `focus_db` создаётся из переменных окружения.
 - **Focus** (NestJS): таблица `users` (пользователи, роли, привязка Telegram, доступ к Kids).
-- **Focus Kids** (FastAPI): таблицы `students`, `teachers`, `groups`, `programs`, `lectures`, `homeworks`, `tests`, `attendance`, `grades` и т.д. — ученики, преподаватели, группы, программы обучения, занятия, посещаемость, оценки.
+- **Focus Kids** (FastAPI): таблицы `students`, `teachers`, `groups`, `programs`, `lectures`, `homeworks`, `tests`, `attendance`, `grades` и т.д.
+- **Focus Sense** (FastAPI): таблицы `sense_meditations`, `sense_affirmations`, `sense_weekly_intentions`, `sense_daily_questions` — аудио и текстовый контент для медитаций и личностного роста.
 
 Список пользователей приходит из Focus (users), списки учеников/преподавателей/групп/занятий — из Focus Kids (БД). При открытии фронта через туннель (Mini App) запросы идут через прокси Next.js; в Docker прокси ведёт на внутренние сервисы `focus-service` и `focus-kids-service`.
 

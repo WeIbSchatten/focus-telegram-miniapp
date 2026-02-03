@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, InternalAxiosRequestConfig } from 'axios';
-import { FOCUS_API_URL, KIDS_API_URL } from '../constants';
+import { FOCUS_API_URL, KIDS_API_URL, SENSE_API_URL } from '../constants';
 import { STORAGE_KEYS } from '../constants';
 import { useAuthStore } from '@/store/authStore';
 
@@ -55,6 +55,35 @@ kidsApi.interceptors.request.use((config: InternalAxiosRequestConfig) => {
 });
 
 kidsApi.interceptors.response.use(
+  (r) => r,
+  (err) => {
+    if (err.response?.status === 401 && typeof window !== 'undefined') {
+      localStorage.removeItem(STORAGE_KEYS.accessToken);
+      localStorage.removeItem(STORAGE_KEYS.user);
+      window.location.href = '/auth/login';
+    }
+    return Promise.reject(err);
+  }
+);
+
+/** Sense service: при пустом SENSE_API_URL запросы идут через прокси Next.js (/api-sense -> backend:8002) */
+const senseBaseURL = SENSE_API_URL ? `${SENSE_API_URL}/api` : '/api-sense';
+export const senseApi: AxiosInstance = axios.create({
+  baseURL: senseBaseURL,
+  headers: { 'Content-Type': 'application/json' },
+});
+
+senseApi.interceptors.request.use((config: InternalAxiosRequestConfig) => {
+  const token = getToken();
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  if (config.method?.toLowerCase() === 'get') {
+    config.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate';
+    config.headers.Pragma = 'no-cache';
+  }
+  return config;
+});
+
+senseApi.interceptors.response.use(
   (r) => r,
   (err) => {
     if (err.response?.status === 401 && typeof window !== 'undefined') {
