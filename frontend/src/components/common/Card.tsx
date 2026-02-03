@@ -11,9 +11,9 @@ interface CardProps extends HTMLAttributes<HTMLDivElement> {
 export function Card({ children, variant = 'default', className = '', ...props }: CardProps) {
   const borderClass =
     variant === 'kids'
-      ? 'border-2 border-kids shadow-soft'
+      ? 'border-2 border-kids shadow-kids'
       : variant === 'sense'
-        ? 'border-2 border-sense/30 shadow-[var(--shadow-sense)]'
+        ? 'border-2 border-sense shadow-sense'
         : 'border-2 border-primary/20 shadow-soft';
   return (
     <div
