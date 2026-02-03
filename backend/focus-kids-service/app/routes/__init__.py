@@ -10,9 +10,11 @@ from .lectures import router as lectures_router
 from .homeworks import router as homeworks_router
 from .tests import router as tests_router
 from .statistics import router as statistics_router
+from .internal import router as internal_router
 
 
 api_router = APIRouter()
+api_router.include_router(internal_router)
 api_router.include_router(students_router)
 api_router.include_router(teachers_router)
 api_router.include_router(groups_router)

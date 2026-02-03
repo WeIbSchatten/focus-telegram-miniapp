@@ -5,9 +5,13 @@
 ## Назначение
 
 - **Кнопка меню** (рядом с полем ввода в чате с ботом) — открывает Mini App по URL из `MINI_APP_URL`.
-- **Команда `/start`** — приветствие и кнопка «Открыть Focus».
-- **Команда `/app`** — быстрая кнопка открытия приложения.
-- **Уведомления** — Focus Kids вызывает `POST /notify`; бот получает `telegram_user_id` из Focus service и отправляет сообщения о новом ДЗ, оценках, тестах и видео.
+- **Команда `/start`** — приветствие с описанием Focus Kids и Focus Sense, кнопки «Focus Kids», «Focus Sense» и «Открыть главную».
+- **Команда `/app`** — кнопки открытия Kids, Sense или главной страницы.
+- **Команда `/kids`** — быстрая кнопка открытия Focus Kids.
+- **Команда `/sense`** — быстрая кнопка открытия Focus Sense.
+- **Команда `/help`** — справка по всем командам.
+- **Команда `/status`** — статус ученика в Focus Kids: есть ли новое ДЗ и непройденные тесты (требует привязанный Telegram и роль ученика).
+- **Уведомления** — Focus Kids вызывает `POST /notify`; бот получает `telegram_user_id` из Focus service и отправляет сообщения о новом ДЗ, оценках, тестах и видео (с форматированием HTML).
 
 Токен бота должен совпадать с `TELEGRAM_BOT_TOKEN` в focus-service (проверка `initData` от Mini App).
 
@@ -20,6 +24,7 @@
 | `NOTIFY_SECRET` | Произвольный длинный секрет; тот же задать в Focus Kids как `TELEGRAM_BOT_NOTIFY_SECRET`. |
 | `INTERNAL_API_SECRET` | Тот же, что в focus-service (для запроса telegram_user_id по focus_user_id). |
 | `FOCUS_SERVICE_URL` | В Docker: `http://focus-service:3000`. Локально: `http://localhost:3001`. |
+| `KIDS_API_URL` | URL Focus Kids API для команды `/status`. В Docker: `http://focus-kids-service:8000`. Локально: `http://localhost:8000`. |
 | `NOTIFY_PORT` | Порт HTTP-сервера уведомлений (по умолчанию 4000). |
 
 ## Настройка
@@ -47,9 +52,7 @@ npm run build && npm start
 Кнопку меню бот выставляет сам через API (`setChatMenuButton`). Дополнительно в BotFather можно указать описание и команды:
 
 - **Bot Settings → Edit Bot Description** — краткое описание.
-- **Bot Settings → Edit Commands** — например:
-  - `/start` — Начать и открыть приложение
-  - `/app` — Открыть Focus
+- **Bot Settings → Edit Commands** — бот сам выставляет команды при запуске (`setMyCommands`): `/start`, `/app`, `/kids`, `/sense`, `/help`.
 
 После настройки пользователи открывают бота, нажимают кнопку меню или «Открыть Focus» в сообщении после `/start` и попадают в Mini App.
 

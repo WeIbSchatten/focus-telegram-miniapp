@@ -9,6 +9,8 @@ class Settings(BaseSettings):
   FOCUS_SERVICE_URL: str = "http://localhost:3001"
   TELEGRAM_BOT_NOTIFY_URL: str = ""
   TELEGRAM_BOT_NOTIFY_SECRET: str = ""
+  # Секрет для внутренних вызовов (бот, Focus): X-Internal-Secret
+  INTERNAL_API_SECRET: str = ""
   # Доп. CORS-истоки (через запятую), например URL туннеля для Mini App
   CORS_ORIGINS_EXTRA: str = ""
 

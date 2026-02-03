@@ -127,8 +127,11 @@ APP_JWT_SECRET=тот_же_APP_JWT_SECRET_что_в_focus-service
 FOCUS_SERVICE_URL=http://focus-service:3000
 TELEGRAM_BOT_NOTIFY_URL=http://focus-telegram-bot:4000
 TELEGRAM_BOT_NOTIFY_SECRET=тот_же_что_TELEGRAM_BOT_NOTIFY_SECRET_в_корне
+INTERNAL_API_SECRET=тот_же_что_в_корневом_.env
 CORS_ORIGINS_EXTRA=https://focusvn.mooo.com
 ```
+
+`INTERNAL_API_SECRET` нужен для команды бота `/status` (статус ученика: новое ДЗ и тесты).
 
 **5.4. backend/focus-sense-service/.env**
 
@@ -145,9 +148,12 @@ TELEGRAM_BOT_TOKEN=ТОКЕН_ОТ_BOTFATHER
 MINI_APP_URL=https://focusvn.mooo.com
 NOTIFY_SECRET=тот_же_что_TELEGRAM_BOT_NOTIFY_SECRET_в_корне
 FOCUS_SERVICE_URL=http://focus-service:3000
+KIDS_API_URL=http://focus-kids-service:8000
 INTERNAL_API_SECRET=тот_же_что_в_корневом_.env
 NOTIFY_PORT=4000
 ```
+
+`KIDS_API_URL` нужен для команды `/status` (статус ученика: новое ДЗ и непройденные тесты).
 
 **5.6. frontend/.env.local**
 
