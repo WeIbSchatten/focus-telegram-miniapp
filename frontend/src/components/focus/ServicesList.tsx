@@ -7,7 +7,7 @@ import { useAuth } from '@/hooks/useAuth';
 const services = [
   {
     title: 'Focus Kids',
-    description: 'Онлайн-школа английского языка для детей. Группы, лекции, домашние задания и тесты.',
+    description: 'Школа английского языка для детей. Группы, лекции, домашние задания и тесты.',
     href: ROUTES.kids.root,
     cta: 'Перейти в Focus Kids',
     kids: true,

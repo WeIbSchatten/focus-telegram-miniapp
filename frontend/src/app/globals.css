@@ -109,3 +109,14 @@ input.range-sense::-moz-range-track {
   border-radius: 9999px;
   background: transparent;
 }
+
+/* Утолщённый прогресс-бар плеера Sense */
+input.range-sense.range-sense-thick {
+  height: 0.75rem;
+}
+input.range-sense.range-sense-thick::-webkit-slider-runnable-track {
+  height: 0.75rem;
+}
+input.range-sense.range-sense-thick::-moz-range-track {
+  height: 0.75rem;
+}

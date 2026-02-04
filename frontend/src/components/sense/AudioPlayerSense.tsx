@@ -135,7 +135,7 @@ export function AudioPlayerSense({ audioPath, title, className = '' }: AudioPlay
 
   return (
     <div
-      className={`overflow-hidden rounded-2xl border-2 border-sense/30 bg-white shadow-[var(--shadow-sense)] ${className}`}
+      className={`overflow-hidden rounded-2xl border border-sense/25 bg-white shadow-[0 4px 24px rgba(61,90,115,0.12), 0 1px 3px rgba(61,90,115,0.08)] ${className}`}
       onContextMenu={handleWrapperContextMenu}
     >
       {/* Скрытый audio без нативного UI; скачивание отключено */}
@@ -147,34 +147,34 @@ export function AudioPlayerSense({ audioPath, title, className = '' }: AudioPlay
         className="hidden"
       />
 
-      <div className="bg-gradient-to-br from-sense/8 via-white to-sense/5 p-5">
-        <p className="mb-4 text-base font-semibold text-sense">{title}</p>
+      <div className="bg-gradient-to-br from-sense/6 via-white to-sense/8 p-6">
+        <p className="mb-4 text-lg font-semibold tracking-tight text-sense-dark">{title}</p>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-5">
           {/* Кнопка Play/Pause */}
           <button
             type="button"
             onClick={togglePlay}
-            className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-gradient-sense text-white shadow-lg transition hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-sense focus:ring-offset-2"
+            className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-sense to-sense-dark text-white shadow-[0 6px 20px rgba(61,90,115,0.35)] transition hover:scale-105 hover:shadow-[0 8px 24px rgba(61,90,115,0.4)] focus:outline-none focus:ring-2 focus:ring-sense focus:ring-offset-2 active:scale-100"
             aria-label={isPlaying ? 'Пауза' : 'Воспроизвести'}
           >
             {isPlaying ? (
-              <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden>
-                <rect x="6" y="4" width="4" height="16" rx="1" />
-                <rect x="14" y="4" width="4" height="16" rx="1" />
+              <svg className="h-7 w-7" fill="currentColor" viewBox="0 0 24 24" aria-hidden>
+                <rect x="6" y="4" width="4" height="16" rx="1.5" />
+                <rect x="14" y="4" width="4" height="16" rx="1.5" />
               </svg>
             ) : (
-              <svg className="ml-1 h-7 w-7" fill="currentColor" viewBox="0 0 24 24" aria-hidden>
+              <svg className="ml-1 h-8 w-8" fill="currentColor" viewBox="0 0 24 24" aria-hidden>
                 <path d="M8 5v14l11-7L8 5z" />
               </svg>
             )}
           </button>
 
-          <div className="min-w-0 flex-1">
+          <div className="min-w-0 flex-1 space-y-2">
             {/* Прогресс-бар */}
-            <div className="relative h-2 w-full rounded-full bg-sense/20">
+            <div className="relative h-3 w-full rounded-full bg-sense/15">
               <div
-                className="absolute left-0 top-0 h-full rounded-full bg-sense transition-[width] duration-75"
+                className="absolute left-0 top-0 h-full rounded-full bg-gradient-to-r from-sense to-sense-light transition-[width] duration-100 ease-out"
                 style={{ width: `${progress}%` }}
               />
               <input
@@ -183,10 +183,10 @@ export function AudioPlayerSense({ audioPath, title, className = '' }: AudioPlay
                 max={duration || 0.01}
                 value={currentTime}
                 onChange={handleSeek}
-                className="range-sense absolute inset-0 h-full w-full cursor-pointer bg-transparent"
+                className="range-sense range-sense-thick absolute inset-0 h-full w-full cursor-pointer bg-transparent"
               />
             </div>
-            <div className="flex justify-between text-xs text-sense/80">
+            <div className="flex justify-between text-sm font-medium tabular-nums text-sense/90">
               <span>{formatTime(currentTime)}</span>
               <span>{formatTime(duration)}</span>
             </div>
