@@ -141,7 +141,7 @@ export function RecordAudioSense({
           <p className="mb-2 text-sm font-medium text-sense">
             Запись готова ({(recordedBlob.size / 1024).toFixed(1)} КБ)
           </p>
-          {previewUrl && <audio controls className="mb-3 w-full max-w-md rounded-lg" src={previewUrl} />}
+          {previewUrl && <audio controls controlsList="nodownload" className="mb-3 w-full max-w-md rounded-lg" src={previewUrl} />}
           <div className="flex flex-wrap gap-2">
             <Button variant="sense" onClick={handleUseRecording} disabled={disabled}>
               Использовать запись
