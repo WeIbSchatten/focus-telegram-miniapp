@@ -144,9 +144,6 @@ export function AudioPlayerSense({ audioPath, title, className = '' }: AudioPlay
         src={src}
         preload="metadata"
         controlsList="nodownload noplaybackrate"
-        disablePictureInPicture
-        disableRemotePlayback
-        playsInline
         className="hidden"
       />
 

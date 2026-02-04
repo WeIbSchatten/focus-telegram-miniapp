@@ -37,7 +37,8 @@ export default function LoginPage() {
     );
     script.async = true;
     telegramWidgetRef.current.appendChild(script);
-  }, [inside, TELEGRAM_BOT_NAME]);
+    // TELEGRAM_BOT_NAME — константа из env, не нужна в deps
+  }, [inside]);
 
   if (isAuthenticated) {
     router.push(ROUTES.home);
