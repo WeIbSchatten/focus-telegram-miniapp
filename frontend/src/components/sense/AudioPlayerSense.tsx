@@ -242,7 +242,7 @@ export function AudioPlayerSense({ audioPath, title, className = '' }: AudioPlay
                 max={duration || 0.01}
                 value={currentTime}
                 onChange={handleSeek}
-                className="range-sense range-sense-slim range-sense-hide-thumb absolute inset-0 h-full w-full cursor-pointer bg-transparent border-0 outline-none"
+                className="range-sense range-sense-slim range-sense-hide-thumb absolute inset-0 h-full w-full cursor-pointer border-0 bg-transparent outline-none focus:outline-none focus:ring-0"
               />
             </div>
             <span className="w-7 shrink-0 text-[11px] font-medium tabular-nums text-sense/70">{formatTime(duration)}</span>
@@ -265,7 +265,7 @@ export function AudioPlayerSense({ audioPath, title, className = '' }: AudioPlay
                 step={0.01}
                 value={volume}
                 onChange={handleVolumeChange}
-                className="range-sense range-sense-slim range-sense-hide-thumb absolute inset-0 h-full w-full cursor-pointer bg-transparent border-0 outline-none"
+                className="range-sense range-sense-slim range-sense-hide-thumb absolute inset-0 h-full w-full cursor-pointer border-0 bg-transparent outline-none focus:outline-none focus:ring-0"
                 aria-label="Громкость"
               />
             </div>

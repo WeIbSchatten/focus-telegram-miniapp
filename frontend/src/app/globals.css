@@ -79,6 +79,25 @@ input.range-sense {
   appearance: none;
   -webkit-appearance: none;
   height: 0.5rem;
+  outline: none;
+}
+input.range-sense:focus,
+input.range-sense:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+/* Убираем обводку при клике (WebKit / Firefox) */
+input.range-sense::-webkit-slider-thumb:focus,
+input.range-sense:focus::-webkit-slider-thumb {
+  outline: none;
+  box-shadow: 0 1px 3px rgba(61, 90, 115, 0.4);
+}
+input.range-sense::-moz-focus-outer {
+  border: none;
+  outline: none;
+}
+input.range-sense::-moz-range-thumb:focus {
+  outline: none;
 }
 input.range-sense::-webkit-slider-thumb {
   appearance: none;
@@ -156,14 +175,18 @@ input.range-sense.range-sense-hide-thumb::-moz-range-thumb {
   pointer-events: none;
   border: none;
 }
-/* Без обводки у трека прогресса */
-input.range-sense.range-sense-slim::-webkit-slider-runnable-track {
+/* Без обводки у трека прогресса и при фокусе */
+input.range-sense.range-sense-slim::-webkit-slider-runnable-track,
+input.range-sense:focus.range-sense-slim::-webkit-slider-runnable-track {
   border: none;
   outline: none;
+  box-shadow: none;
 }
-input.range-sense.range-sense-slim::-moz-range-track {
+input.range-sense.range-sense-slim::-moz-range-track,
+input.range-sense:focus.range-sense-slim::-moz-range-track {
   border: none;
   outline: none;
+  box-shadow: none;
 }
 
 /* Анимация волн на обложке плеера Sense (при воспроизведении) */
