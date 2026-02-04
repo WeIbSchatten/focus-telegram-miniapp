@@ -120,3 +120,22 @@ input.range-sense.range-sense-thick::-webkit-slider-runnable-track {
 input.range-sense.range-sense-thick::-moz-range-track {
   height: 0.75rem;
 }
+
+/* Тонкий прогресс-бар (компактный плеер) */
+input.range-sense.range-sense-slim {
+  height: 0.375rem;
+}
+input.range-sense.range-sense-slim::-webkit-slider-thumb {
+  width: 0.75rem;
+  height: 0.75rem;
+}
+input.range-sense.range-sense-slim::-webkit-slider-runnable-track {
+  height: 0.375rem;
+}
+input.range-sense.range-sense-slim::-moz-range-thumb {
+  width: 0.75rem;
+  height: 0.75rem;
+}
+input.range-sense.range-sense-slim::-moz-range-track {
+  height: 0.375rem;
+}

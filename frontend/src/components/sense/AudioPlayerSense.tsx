@@ -109,14 +109,11 @@ export function AudioPlayerSense({ audioPath, title, className = '' }: AudioPlay
 
   if (loading) {
     return (
-      <div className={`rounded-2xl border-2 border-sense/20 bg-gradient-to-br from-sense/10 to-sense/5 p-5 ${className}`}>
-        <p className="text-sm font-semibold text-sense">{title}</p>
-        <div className="mt-3 flex items-center gap-3">
-          <div className="h-12 w-12 animate-pulse rounded-full bg-sense/20" />
-          <div className="flex-1 space-y-2">
-            <div className="h-2 w-full animate-pulse rounded-full bg-sense/20" />
-            <p className="text-xs text-sense/70">Загрузка…</p>
-          </div>
+      <div className={`flex w-full max-w-sm items-center gap-3 rounded-xl border border-sense/20 bg-white/80 px-4 py-3 shadow-sm ${className}`}>
+        <div className="h-11 w-11 shrink-0 animate-pulse rounded-full bg-sense/20" />
+        <div className="min-w-0 flex-1 space-y-1.5">
+          <p className="truncate text-sm font-medium text-sense">{title}</p>
+          <div className="h-1.5 w-full animate-pulse rounded-full bg-sense/15" />
         </div>
       </div>
     );
@@ -124,9 +121,9 @@ export function AudioPlayerSense({ audioPath, title, className = '' }: AudioPlay
 
   if (error || !src) {
     return (
-      <div className={`rounded-2xl border-2 border-amber-200 bg-amber-50/80 p-5 ${className}`}>
-        <p className="text-sm font-semibold text-amber-800">{title}</p>
-        <p className="mt-1 text-sm text-amber-700">{error ?? 'Аудио недоступно'}</p>
+      <div className={`w-full max-w-sm rounded-xl border border-amber-200 bg-amber-50/80 px-4 py-3 ${className}`}>
+        <p className="truncate text-sm font-medium text-amber-800">{title}</p>
+        <p className="mt-0.5 text-xs text-amber-700">{error ?? 'Аудио недоступно'}</p>
       </div>
     );
   }
@@ -135,10 +132,9 @@ export function AudioPlayerSense({ audioPath, title, className = '' }: AudioPlay
 
   return (
     <div
-      className={`overflow-hidden rounded-2xl border border-sense/25 bg-white shadow-[0 4px 24px rgba(61,90,115,0.12), 0 1px 3px rgba(61,90,115,0.08)] ${className}`}
+      className={`flex w-full max-w-sm flex-col gap-2.5 rounded-xl border border-sense/20 bg-white px-4 py-3 shadow-[0 2px 12px rgba(61,90,115,0.1)] ${className}`}
       onContextMenu={handleWrapperContextMenu}
     >
-      {/* Скрытый audio без нативного UI; скачивание отключено */}
       <audio
         ref={audioRef}
         src={src}
@@ -147,51 +143,48 @@ export function AudioPlayerSense({ audioPath, title, className = '' }: AudioPlay
         className="hidden"
       />
 
-      <div className="bg-gradient-to-br from-sense/6 via-white to-sense/8 p-6">
-        <p className="mb-4 text-lg font-semibold tracking-tight text-sense-dark">{title}</p>
+      {/* Верхняя строка: кнопка + название */}
+      <div className="flex min-w-0 items-center gap-3">
+        <button
+          type="button"
+          onClick={togglePlay}
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-sense text-white transition hover:bg-sense-dark focus:outline-none focus:ring-2 focus:ring-sense focus:ring-offset-2 active:scale-95"
+          aria-label={isPlaying ? 'Пауза' : 'Воспроизвести'}
+        >
+          {isPlaying ? (
+            <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden>
+              <rect x="6" y="5" width="3" height="14" rx="1" />
+              <rect x="15" y="5" width="3" height="14" rx="1" />
+            </svg>
+          ) : (
+            <svg className="ml-0.5 h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden>
+              <path d="M8 5v14l11-7L8 5z" />
+            </svg>
+          )}
+        </button>
+        <p className="min-w-0 flex-1 truncate text-sm font-medium text-sense-dark">{title}</p>
+      </div>
 
-        <div className="flex items-center gap-5">
-          {/* Кнопка Play/Pause */}
-          <button
-            type="button"
-            onClick={togglePlay}
-            className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-sense to-sense-dark text-white shadow-[0 6px 20px rgba(61,90,115,0.35)] transition hover:scale-105 hover:shadow-[0 8px 24px rgba(61,90,115,0.4)] focus:outline-none focus:ring-2 focus:ring-sense focus:ring-offset-2 active:scale-100"
-            aria-label={isPlaying ? 'Пауза' : 'Воспроизвести'}
-          >
-            {isPlaying ? (
-              <svg className="h-7 w-7" fill="currentColor" viewBox="0 0 24 24" aria-hidden>
-                <rect x="6" y="4" width="4" height="16" rx="1.5" />
-                <rect x="14" y="4" width="4" height="16" rx="1.5" />
-              </svg>
-            ) : (
-              <svg className="ml-1 h-8 w-8" fill="currentColor" viewBox="0 0 24 24" aria-hidden>
-                <path d="M8 5v14l11-7L8 5z" />
-              </svg>
-            )}
-          </button>
-
-          <div className="min-w-0 flex-1 space-y-2">
-            {/* Прогресс-бар */}
-            <div className="relative h-3 w-full rounded-full bg-sense/15">
-              <div
-                className="absolute left-0 top-0 h-full rounded-full bg-gradient-to-r from-sense to-sense-light transition-[width] duration-100 ease-out"
-                style={{ width: `${progress}%` }}
-              />
-              <input
-                type="range"
-                min={0}
-                max={duration || 0.01}
-                value={currentTime}
-                onChange={handleSeek}
-                className="range-sense range-sense-thick absolute inset-0 h-full w-full cursor-pointer bg-transparent"
-              />
-            </div>
-            <div className="flex justify-between text-sm font-medium tabular-nums text-sense/90">
-              <span>{formatTime(currentTime)}</span>
-              <span>{formatTime(duration)}</span>
-            </div>
-          </div>
+      {/* Прогресс и время в одну строку */}
+      <div className="flex items-center gap-3">
+        <span className="w-8 shrink-0 text-right text-xs tabular-nums text-sense/80">
+          {formatTime(currentTime)}
+        </span>
+        <div className="relative h-1.5 min-w-0 flex-1 rounded-full bg-sense/15">
+          <div
+            className="absolute left-0 top-0 h-full rounded-full bg-sense transition-[width] duration-75"
+            style={{ width: `${progress}%` }}
+          />
+          <input
+            type="range"
+            min={0}
+            max={duration || 0.01}
+            value={currentTime}
+            onChange={handleSeek}
+            className="range-sense range-sense-slim absolute inset-0 h-full w-full cursor-pointer bg-transparent"
+          />
         </div>
+        <span className="w-8 shrink-0 text-xs tabular-nums text-sense/80">{formatTime(duration)}</span>
       </div>
     </div>
   );
