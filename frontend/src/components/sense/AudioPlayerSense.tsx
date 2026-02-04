@@ -221,7 +221,7 @@ export function AudioPlayerSense({ audioPath, title, className = '' }: AudioPlay
             <p className="min-w-0 flex-1 truncate text-sm font-semibold text-sense-dark">{title}</p>
           </div>
 
-          {/* Прогресс и время */}
+          {/* Прогресс и время: ползунок привязан к progress%, без обводки */}
           <div className="flex items-center gap-2">
             <span className="w-7 shrink-0 text-right text-[11px] font-medium tabular-nums text-sense/70">
               {formatTime(currentTime)}
@@ -231,24 +231,29 @@ export function AudioPlayerSense({ audioPath, title, className = '' }: AudioPlay
                 className="absolute left-0 top-0 h-full rounded-full bg-sense transition-[width] duration-75"
                 style={{ width: `${progress}%` }}
               />
+              {/* Кастомный ползунок по progress — всегда совпадает с заливкой */}
+              <div
+                className="pointer-events-none absolute left-0 top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-sense shadow-[0_1px_3px_rgba(61,90,115,0.4)] transition-[left] duration-75"
+                style={{ left: `${progress}%` }}
+              />
               <input
                 type="range"
                 min={0}
                 max={duration || 0.01}
                 value={currentTime}
                 onChange={handleSeek}
-                className="range-sense range-sense-slim absolute inset-0 h-full w-full cursor-pointer bg-transparent"
+                className="range-sense range-sense-slim range-sense-hide-thumb absolute inset-0 h-full w-full cursor-pointer bg-transparent border-0 outline-none"
               />
             </div>
             <span className="w-7 shrink-0 text-[11px] font-medium tabular-nums text-sense/70">{formatTime(duration)}</span>
           </div>
 
-          {/* Громкость */}
+          {/* Громкость: короткая полоска */}
           <div className="flex items-center gap-2">
-            <span className="flex h-7 w-7 shrink-0 items-center justify-center text-sense/80" aria-hidden>
+            <span className="flex h-6 w-6 shrink-0 items-center justify-center text-sense/80" aria-hidden>
               <VolumeIcon volume={volume} />
             </span>
-            <div className="relative h-1 min-w-0 flex-1 rounded-full bg-sense/15">
+            <div className="relative h-1 w-20 shrink-0 rounded-full bg-sense/15">
               <div
                 className="absolute left-0 top-0 h-full rounded-full bg-sense/60 transition-[width] duration-75"
                 style={{ width: `${volume * 100}%` }}
@@ -260,7 +265,7 @@ export function AudioPlayerSense({ audioPath, title, className = '' }: AudioPlay
                 step={0.01}
                 value={volume}
                 onChange={handleVolumeChange}
-                className="range-sense range-sense-slim absolute inset-0 h-full w-full cursor-pointer bg-transparent"
+                className="range-sense range-sense-slim range-sense-hide-thumb absolute inset-0 h-full w-full cursor-pointer bg-transparent border-0 outline-none"
                 aria-label="Громкость"
               />
             </div>
